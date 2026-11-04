@@ -1,0 +1,20 @@
+{
+  "summary": "Frontend-only check of the new playground hero and 3 regressions. All requested items pass. Hero: data-testid=hero-playground loads (/hk/playground_hero.jpg, naturalWidth 1264x848). It sits in a rounded frame with a 40px radius and a 4px navy border. Image size is 1016x677 at 1920 and 350x233 at 390. The image ratio (1.49) is almost exactly the 3/2 aspect-ratio, so object-cover crops it by less than 1%. No rainbow paths remain in landing-hero; the only SVG paths are the arrow icon and the green/cream ground waves. The only hero images are logo.png and playground_hero.jpg, so storybook.png and the character cut-outs are gone. The picture shows the slide, swings, sandpit, the full open book with floating letters/numbers, and all 5 characters, with the bunny fully visible. Logo and heading render. hero-start-learning goes to /learn. hero-explore-worlds scrolls to worlds-section (top lands at 112px, under the sticky nav). No horizontal scroll at 390 (scrollWidth 390) or 1920. More or Less, Parent gate and Drawing Studio regressions all pass.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "DrawGame brush size buttons", "issue": "Seen in a screenshot, not in the requested scope: the 3 brush-size buttons (brush-0/1/2) look like blank squares with no visible size dot. The size dot is a <span> without display:inline-block/block, so its width and height may be ignored. Adding 'inline-block' (or 'block') to the span's classes should fix it.", "selector": "[data-testid^=brush-]", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": ["Optional: make the brush-size dots visible in DrawGame (add inline-block to the span)"],
+  "critical_code_review_comments": ["LandingPage Hero is clean: one image, alt text present, aspect ratio matches the asset. Could add width/height attributes or loading=eager/fetchpriority=high on the hero image to improve LCP and avoid layout shift."],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "100% of requested items"},
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Hero image is [data-testid=hero-playground]. More-or-less results: puzzle 1 = 1 more than 6 (answer choice-btn-7, then next-button); puzzle 2 = 2 less than 5. Hop arcs are [data-testid^=hop-arc-]. Parent gate: use mouse.down on parent-gate-btn, wait 3.4s, then mouse.up. The gate comes back on both SPA re-entry and page reload. Drawing route is /play/drawing-studio."
+}

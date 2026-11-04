@@ -91,7 +91,7 @@ export default function DrawGame({ activity }) {
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
             {SIZES.map((sz, i) => (
               <button type="button" key={sz} onClick={() => setSize(sz)} aria-pressed={size === sz} aria-label={["thin", "medium", "thick"][i] + " brush"} data-testid={`brush-${i}`} className={`toy-btn px-3 ${size === sz ? "bg-hc-sunlight" : "bg-white"}`}>
-                <span className="rounded-full bg-hc-navy" style={{ width: sz + 4, height: sz + 4 }} />
+                <span className="block rounded-full bg-hc-navy" style={{ width: sz + 4, height: sz + 4 }} />
               </button>
             ))}
             <ToyButton color={eraser ? "sun" : "white"} onClick={() => setEraser(!eraser)} data-testid="eraser-button"><Eraser className="h-5 w-5" /> Eraser</ToyButton>
