@@ -101,3 +101,5 @@ body {
 .hk-sky { background: linear-gradient(180deg, #BFE6FF 0%, #E4F5FF 45%, #FFF6E3 100%); }
 @keyframes hk-drift { 0% { transform: translateX(-10%); } 100% { transform: translateX(110vw); } }
 .hk-cloud { animation: hk-drift 60s linear infinite; }
+@keyframes hk-sway { 0%, 100% { transform: rotate(7deg); } 50% { transform: rotate(-7deg); } }
+.hk-swing { transform-box: view-box; animation: hk-sway 3.2s ease-in-out infinite; }

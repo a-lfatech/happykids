@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, BookOpen, Heart, Puzzle, ShieldCheck, Sparkles, Star } from "lucide-react";
 import { PageShell } from "../components/SiteNav";
 import { ToyButton } from "../components/ToyButton";
+import { PlaygroundScene } from "../components/PlaygroundScene";
 import { WORLDS } from "../data/worlds";
 
 const FLOATERS = [
@@ -38,7 +39,7 @@ const Hero = () => {
 
         <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2, type: "spring", stiffness: 120, damping: 16 }} className="relative mx-auto mt-10 max-w-5xl">
           <div className="overflow-hidden rounded-[2rem] border-[4px] border-hc-navy bg-white sm:rounded-[2.5rem]" style={{ boxShadow: "0 8px 0 #1F2547" }}>
-            <img src="/hk/playground_hero.jpg" alt="Hoppy, Ellie, Finn, Froggy and Sunny around a magical storybook in a sunny playground" className="block aspect-[3/2] w-full object-cover" data-testid="hero-playground" />
+            <PlaygroundScene />
           </div>
           <span className="absolute -left-3 -top-4 rotate-[-8deg] rounded-full border-[3px] border-hc-navy bg-hc-mint px-4 py-1.5 font-fredoka text-base font-bold sm:-left-6 sm:text-xl" aria-hidden="true">Play!</span>
           <span className="absolute -right-3 -top-4 rotate-[8deg] rounded-full border-[3px] border-hc-navy bg-hc-sky px-4 py-1.5 font-fredoka text-base font-bold sm:-right-6 sm:text-xl" aria-hidden="true">Learn!</span>
