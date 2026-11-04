@@ -1,0 +1,24 @@
+{
+  "summary": "Frontend-only retest of PlaygroundScene after the iteration_5 fixes. I hard-reloaded at both sizes first, so the latest bundle was tested. At 390px and 1920px, all 5 friends (ellie, hoppy, finn, froggy, sunny) show a bubble fully inside the scene, measured after the click, with the correct name and greeting: 10/10 pass. Froggy at 390 (the previous failure) now fits because the JS clamp at line 43 is in the code. At 1920, Froggy's and Sunny's bubbles are anchored to the bottom of the picture and no longer cover Finn's face; I checked this with numbers and with screenshots. Only one scene-hello-bubble exists at a time. swing-blue and swing-red transforms change over time at both sizes. The 'Tap a friend to say hello!' hint shows at the top-right on desktop (12px from the right and top) and is hidden at 390, as designed with sm:flex. scrollWidth stays at 390 at 390px, before and after the clicks.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Hero playground 390 (minor)", "issues": ["At 390, Froggy's and Sunny's bubbles (scene-x about 168-342, scene-y about 443-532) cover Finn's chin and the lower part of his head, and fully hide Froggy and Sunny themselves. Finn's eyes and ears stay visible. This is acceptable on such a small scene and was not part of the requirement. Optional: keep the bubble visible a little shorter on mobile, or make it slightly see-through."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "The bubble width bw (176/256) is hardcoded to match w-44/sm:w-64 and the 640px breakpoint. If the Tailwind classes change, the clamp breaks. Consider measuring the bubble with a ref instead.",
+    "The timeout in timer.current is still not cleared on unmount. Add useEffect(() => () => clearTimeout(timer.current), []).",
+    "If the window is resized while a bubble is open, left is not recalculated. This is minor because the bubble closes after 4 seconds."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "100% (10/10 bubble bound checks, Finn's face clear at 1920, single bubble, swings animate, hint, no horizontal scroll)"},
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Scene at 390 is 20..370 x 305.5..538.8 after scrollIntoView with block:center; at 1920 it is 452..1468 x 201.8..879.1. Wait about 900ms after the click before measuring. All the PlaygroundScene bubble checks passed in iteration_6."
+}
