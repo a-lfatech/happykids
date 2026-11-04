@@ -1,0 +1,9 @@
+.speech-tail {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  background: #fff;
+  border-left: 3px solid #1f2547;
+  border-bottom: 3px solid #1f2547;
+  transform: rotate(45deg);
+}

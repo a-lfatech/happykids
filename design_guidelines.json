@@ -1,0 +1,141 @@
+{
+  "project_name": "HOP & COUNT",
+  "tagline": "Little Hops. Big Maths Adventures!",
+  "app_type": "mobile_web_app",
+  "target_audience": "Kindergarten to Grade 1 (ages 4–7)",
+  "design_philosophy": "Anti-AI Slop, tactile children's book aesthetic combined with Brilliant.org-inspired interactive micro-learning logic. Soft playful palette, ultra-legible typography for early readers, chunky rounded cards with 3px deep-navy borders and offset pressable buttons. Voice-first guidance with speech bubbles and Web Speech API synthesis.",
+  "theme": "Light, warm vanilla background with vibrant pastel pops",
+  "typography": {
+    "heading_and_numbers": "Fredoka, cursive, display, sans-serif",
+    "body_and_instructions": "Nunito, sans-serif",
+    "font_imports": [
+      "https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@500;600;700;800;900&display=swap"
+    ],
+    "hierarchy": {
+      "app_title": "text-4xl sm:text-5xl lg:text-6xl font-bold tracking-wide font-fredoka text-slate-900",
+      "game_heading": "text-2xl sm:text-3xl font-extrabold font-fredoka text-slate-800",
+      "speech_text": "text-lg sm:text-xl font-bold font-nunito text-slate-800 leading-snug",
+      "number_tile_text": "text-3xl sm:text-4xl lg:text-5xl font-bold font-fredoka",
+      "button_text": "text-lg sm:text-xl font-extrabold font-fredoka tracking-wide",
+      "body_text": "text-base sm:text-lg font-semibold font-nunito text-slate-700"
+    }
+  },
+  "colors": {
+    "background_main": "#FFFDF5",
+    "card_background": "#FFFFFF",
+    "border_stroke": "#0F172A",
+    "border_width": "3px",
+    "shadow_offset": "0px 5px 0px #0F172A",
+    "palettes": {
+      "warm_vanilla": "#FFFDF5",
+      "sunshine_yellow": "#FFD166",
+      "sky_blue_forward": "#4EA8DE",
+      "tangerine_orange_backward": "#F78C6C",
+      "fresh_mint_correct": "#06D6A0",
+      "lavender_bunny": "#B8C0FF",
+      "coral_pink_accents": "#FF70A6",
+      "frog_green": "#88D498",
+      "chick_yellow": "#FFE066",
+      "deep_navy_text": "#0F172A",
+      "soft_gray_empty": "#E2E8F0"
+    },
+    "states": {
+      "count_forward_badge": "bg-[#4EA8DE] text-white border-2 border-[#0F172A]",
+      "count_backward_badge": "bg-[#F78C6C] text-white border-2 border-[#0F172A]",
+      "correct_feedback": "bg-[#06D6A0] text-slate-900 border-3 border-[#0F172A]",
+      "incorrect_feedback": "bg-[#FF70A6] text-slate-900 border-3 border-[#0F172A]"
+    }
+  },
+  "characters": [
+    {
+      "id": "hoppy",
+      "name": "Hoppy",
+      "type": "Lilac Bunny",
+      "color": "#B8C0FF",
+      "ears": "long floppy lilac ears with soft pink inner ear pads",
+      "personality": "Cheerful, loves jumping forward!",
+      "svg_description": "Inline hand-drawn styled SVG bunny with big round cheeks, cute twitching nose, lavender body, white tummy circle, and friendly wink"
+    },
+    {
+      "id": "froggy",
+      "name": "Froggy",
+      "type": "Green Frog",
+      "color": "#88D498",
+      "eyes": "big expressive top eyes",
+      "personality": "Master of the 6-box number line hops!",
+      "svg_description": "Inline SVG frog with rosy pink cheeks, wide happy mouth, mint-green belly, ready to spring along curved arrows"
+    },
+    {
+      "id": "sunny",
+      "name": "Sunny",
+      "type": "Yellow Chick",
+      "color": "#FFE066",
+      "beak": "tiny orange beak",
+      "personality": "Loves counting more & less with stars!",
+      "svg_description": "Inline SVG cute yellow chick with feather tuft on top, coral pink wing accent, bright sparkling eyes"
+    }
+  ],
+  "games": [
+    {
+      "id": "missing_numbers",
+      "title": "Missing Numbers",
+      "subtitle": "Fill in the missing numbers (to 10)",
+      "badge": "6 Puzzles",
+      "description": "Child sees 5 tiles with 1 or 2 missing numbers, direction indicator (COUNT FORWARD → / ← COUNT BACKWARD), speech audio, and 1-10 key pad.",
+      "total_puzzles": 6
+    },
+    {
+      "id": "more_or_less",
+      "title": "More or Less",
+      "subtitle": "Hop along the number line!",
+      "badge": "8 Puzzles",
+      "description": "Number line with 6 boxes, START marker, Froggy hopping along curved arrows with white circle hop numbers (+1, +2, -1, -2), and 3 chunky choice buttons.",
+      "total_puzzles": 8
+    }
+  ],
+  "key_components": [
+    {
+      "name": "Header & Top Bar",
+      "features": ["App Logo with hopping bunny icon", "Star Counter counter with pulse animation", "Sound / Mute toggle (Web Audio API)", "Grown-Up Corner Gate (3-second press and hold button)"]
+    },
+    {
+      "name": "Speech & Audio Bar",
+      "features": ["Character Avatar with talking mouth animation", "Speech Bubble with clean high-contrast text", "Big Yellow 'LISTEN' button with speaker wave icon", "Web Speech API TTS reader with custom Web Audio synthetic fallbacks"]
+    },
+    {
+      "name": "Game 1: Missing Numbers Engine",
+      "features": ["Direction badge: BLUE [COUNT FORWARD →] or ORANGE [← COUNT BACKWARD]", "5 horizontal chunky cards (blanks highlight with dotted outline)", "1-10 on-screen number pad (56px+ touch targets)", "Immediate tactile haptic feedback & sound effects", "Progress dots indicator (6 puzzle steps)"]
+    },
+    {
+      "name": "Game 2: More or Less Number Line Engine",
+      "features": ["6-box horizontal number line with START flag", "Curved SVG arc with arrowheads depicting hop direction", "White circle hop indicators (e.g., +2 MORE / -1 LESS)", "Animated Froggy character hopping along the arc", "3 big choice buttons at the bottom", "Direction always uses both arrows and text (e.g. 2 LESS ←)"]
+    },
+    {
+      "name": "Celebration Screen",
+      "features": ["ALL DONE! Banner", "Confetti canvas explosion", "3 big animated gold stars", "Replay game CTA & Return to Home CTA", "Sound fanfare cheer"]
+    },
+    {
+      "name": "Grown-Up Corner (Parent Dashboard)",
+      "features": ["Press & Hold 3 Seconds Gate with progress indicator bar", "Stats: Puzzles completed, accuracy %, stars earned, average time per puzzle", "Reset progress button", "Sound & Audio TTS settings", "Pedagogical Grade 1 worksheet notes for parents"]
+    }
+  ],
+  "audio_system": {
+    "engine": "Web Audio API (Synthesizer for chiming notes, jumps, boings, win fanfare) + Web Speech API (SpeechSynthesisUtterance)",
+    "sound_toggle": "Stored in localStorage ('hop_count_sound_enabled')",
+    "speech_voice": "Friendly high-pitched en-US voice selected automatically"
+  },
+  "local_storage_keys": {
+    "progress": "hop_count_game_progress_v1",
+    "sound": "hop_count_sound_v1",
+    "stars": "hop_count_total_stars_v1"
+  },
+  "instructions_to_main_agent": [
+    "Ensure all interactive buttons are chunky (min-height 56px, rounded-2xl or rounded-3xl) with 3px solid #0F172A border and 4-5px hard offset box shadow (e.g. shadow-[4px_5px_0px_#0F172A] or custom inline style box-shadow: 0 5px 0 #0F172A). Active button presses down translate-y-1 shadow-[0px_1px_0px_#0F172A].",
+    "Load Google Fonts Fredoka and Nunito dynamically in index.html or top of App.jsx / App.css.",
+    "Implement hand-crafted inline SVG components for the 3 vector characters (Hoppy Bunny, Froggy Frog, Sunny Chick) with multiple expressions (neutral, talking, celebrating, thinking).",
+    "Ensure the Grown-Up Gate requires holding the button for 3 full seconds (with an animated filling ring or bar indicator) before opening the Parent Dashboard modal.",
+    "Always include clear data-testid attributes on all key elements: data-testid='home-screen', data-testid='game-card-missing-numbers', data-testid='game-card-more-or-less', data-testid='listen-button', data-testid='number-pad-btn-{n}', data-testid='choice-btn-{n}', data-testid='parent-gate-btn', data-testid='parent-dashboard', data-testid='sound-toggle', data-testid='star-count'.",
+    "Add Web Audio synthesized sound generator (zero external asset dependency) for tap sound, correct ding, wrong boing, and level complete fanfare.",
+    "Ensure the game is fully playable on mobile screens (responsive grid/flex layouts, scroll-proof 100vh container with touch-friendly spacing)."
+  ]
+}
