@@ -109,7 +109,7 @@ export default function HomeScreen() {
               <br />
               <span style={{ textShadow: "4px 5px 0 #FFC93C" }}>COUNT</span>
             </motion.h1>
-            <p className="mt-4 font-fredoka text-2xl font-semibold sm:text-3xl" data-testid="app-tagline">Little Hops. Big Maths Adventures!</p>
+            <p className="mt-4 font-fredoka text-xl font-semibold sm:text-3xl" data-testid="app-tagline">Little Hops. Big Maths Adventures!</p>
             <a href="#games" className="toy-btn mt-6 inline-flex items-center gap-2 bg-hc-sun px-6 text-xl" data-testid="lets-play-link">
               Let's play <ArrowRight className="h-6 w-6" strokeWidth={3} />
             </a>

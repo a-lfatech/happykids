@@ -27,7 +27,8 @@ export function AppStateProvider({ children }) {
   }, [state]);
 
   useEffect(() => {
-    onSpeechFail(() => setAudioHelp(true));
+    let shown = false;
+    onSpeechFail(() => { if (!shown) { shown = true; setAudioHelp(true); } });
     const u = () => unlockAudio();
     window.addEventListener("pointerdown", u, { once: true });
     window.addEventListener("keydown", u, { once: true });

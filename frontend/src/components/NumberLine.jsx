@@ -95,13 +95,13 @@ export const NumberLine = ({ numbers, start, frogAt, hops, onTap, shake, answer,
         {numbers.map((n) => (
           <div key={n} className="flex justify-center">
             {n === start && (
-              <span className="flex items-center gap-1 rounded-full border-[3px] border-hc-navy bg-hc-sun px-2 py-0.5 font-fredoka text-xs font-bold sm:text-sm" data-testid="start-label">
-                <Flag className="h-3.5 w-3.5" strokeWidth={3} /> START
+              <span className="flex items-center gap-1 rounded-full border-[3px] border-hc-navy bg-hc-sun px-1.5 py-0.5 font-fredoka text-[10px] font-bold sm:px-2 sm:text-sm" data-testid="start-label">
+                <Flag className="hidden h-3.5 w-3.5 sm:block" strokeWidth={3} /> START
               </span>
             )}
             {solved && n === answer && (
-              <span className="flex items-center gap-1 rounded-full border-[3px] border-hc-navy bg-hc-mint px-2 py-0.5 font-fredoka text-xs font-bold sm:text-sm" data-testid="answer-label">
-                <Check className="h-3.5 w-3.5" strokeWidth={4} /> YES!
+              <span className="flex items-center gap-1 rounded-full border-[3px] border-hc-navy bg-hc-mint px-1.5 py-0.5 font-fredoka text-[10px] font-bold sm:px-2 sm:text-sm" data-testid="answer-label">
+                <Check className="hidden h-3.5 w-3.5 sm:block" strokeWidth={4} /> YES!
               </span>
             )}
           </div>

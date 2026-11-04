@@ -1,0 +1,32 @@
+{
+  "summary": "Frontend-only E2E test of HOP & COUNT (desktop 1920 + mobile 390). Home, settings, both games (all 6 Missing Numbers + all 8 More or Less puzzles), any-order fill, keyboard input, wrong-answer hints/shake, hop buttons/arcs/froggy-marker, auto-hop on correct, progress dots, session stars, achievement screen, leave dialog, grown-up press-hold gate, dashboard stats, reset, localStorage persistence, route guards and mobile overflow all work. No page errors. Only minor UI polish issues found.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "NumberLine (mobile 390px)", "issue": "On 1-more/1-less puzzles the START and YES! labels sit under next-door boxes and overlap each other on narrow screens", "selector": "[data-testid=start-label], [data-testid=answer-label]", "priority": "LOW"},
+      {"component": "Audio-help note (fixed bottom-left)", "issue": "On mobile the 'Grown-ups: can't hear the voice?' note covers the bottom of the answer choices and the Next button until someone closes it. It only appears when the browser can't speak, but that also happens on real devices that don't support speech.", "selector": "audio-help note", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Parent dashboard", "issues": ["Wrong plural: '1 tries needed' should be '1 try needed'"]},
+      {"screen": "Home mobile", "issues": ["Tagline 'Little Hops. Big Maths Adventures!' almost touches the right edge at 390px (no overflow)"]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Fix the START/YES! label overlap on the number line at 390px when the start and answer boxes are next to each other (e.g. stack them or make them smaller)",
+    "Move the audio-help note on mobile so it doesn't cover the Next button and answer choices (e.g. put it at the top, or add bottom padding while it shows)",
+    "Fix the wording '1 tries needed' in the practice-areas list"
+  ],
+  "critical_code_review_comments": [
+    "The hc_grownup sessionStorage flag is only cleared by parent-back-button. If a grown-up leaves /grown-ups with the browser back button, the flag stays set, so a child can open /grown-ups directly without the gate for the rest of that session. Clear it when ParentDashboard unmounts.",
+    "Hop back adds an arc and doesn't remove the previous forward arc (e.g. 2 forward + 1 back = 3 arcs). Likely intended as a hop trail; just confirming this is the intended design.",
+    "Keyboard 0=10 is handled in code (MissingNumbersGame onKey). No puzzle answer is 10, so it was not tested end-to-end."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (frontend only)", "frontend": "100% of requested flows pass; 2 low-priority UI issues"},
+  "seed_data_creation": "None. Only browser localStorage in the test browser was used; the reset was done in that test browser's storage.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Verified: MN answers [3,4],[6,7],[5,4],[8,7],[6,7,8],[7,6,4] in any order. Wrong answer gives 'Not quite! You picked N...' and the dot becomes 'done' instead of 'star'. ML windows/choices checked for all 8 puzzles, auto arcs = |delta|, next-button only appears after the animation. Gate: short tap and a 1.5s hold do nothing, a 3.4s hold opens /grown-ups. Direct /grown-ups and /done/* without state redirect to /. Use page.on('dialog', accept) because of the beforeunload handler."
+}

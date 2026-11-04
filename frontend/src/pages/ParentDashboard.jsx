@@ -77,7 +77,7 @@ export default function ParentDashboard() {
               {practice.length === 0 && <li className="rounded-2xl bg-hc-mintlight p-3 font-bold">Nothing flagged yet. Keep playing to see tips here!</li>}
               {practice.map(([k, v]) => (
                 <li key={k} className="flex items-center justify-between rounded-2xl border-[3px] border-hc-navy bg-hc-corallight p-3 font-bold">
-                  <span>{k}</span><span className="text-sm">{v.wrongs} tries needed</span>
+                  <span>{k}</span><span className="text-sm">{v.wrongs} extra {v.wrongs === 1 ? "try" : "tries"}</span>
                 </li>
               ))}
             </ul>
