@@ -86,15 +86,32 @@ export default function MoreOrLessGame() {
     if (level >= 3) later(() => animateHops(), 900);
   };
 
+  // Hops always show the path from START: hopping back removes the last arrow instead of adding one.
   const hop = (dir) => {
     if (s.solved || busy) return;
     s.markAttempt();
+    const need = Math.abs(p.delta);
+    const hopWord = (n) => (n === 1 ? "hop" : "hops");
     const to = frogAt + dir;
-    if (!nums.includes(to) || hops.length >= 5) { setText("Froggy can't hop any further that way! Try the other way or start again."); return; }
-    setHops((h) => [...h, { from: frogAt, to }]);
+    const last = hops[hops.length - 1];
+    const goingBack = last && Math.sign(last.to - last.from) !== dir;
+    if (!nums.includes(to)) { const m = "Froggy can't hop any further that way! Try the other way."; setText(m); voice.say(m); return; }
+    if (!goingBack && hops.length >= need) {
+      const m = `Whoa, Froggy! The question says ${need} ${hopWord(need)}, and Froggy has already hopped ${need}. Hop back, or tap the box Froggy is on.`;
+      setText(m); voice.say(m); return;
+    }
+    setHops(goingBack ? hops.slice(0, -1) : [...hops, { from: frogAt, to }]);
     setFrogAt(to);
     sfx.hop();
-    voice.say(String(to));
+    const net = to - p.start;
+    const k = Math.abs(net);
+    let m;
+    if (k === 0) m = `Froggy is back at ${p.start}, the start. Remember, the question says ${need} ${hopWord(need)} ${more ? "forward" : "backward"}.`;
+    else if (Math.sign(net) !== Math.sign(p.delta)) m = `Oops, that hop went ${dir > 0 ? "forward to the right" : "backward to the left"}. ${more ? "More means hopping forward to the right" : "Less means hopping backward to the left"}. Hop back to ${p.start} and try the other way.`;
+    else if (k < need) m = `${k} ${hopWord(k)}! ${need - k} more ${hopWord(need - k)} to reach your goal. Remember, the question says ${need} ${hopWord(need)}.`;
+    else m = `${need} ${hopWord(need)}! Froggy landed on ${to}. Tap that box to check your answer!`;
+    setText(m);
+    voice.say(m);
   };
 
   const resetHops = () => { if (busy) return; setHops([]); setFrogAt(p.start); };

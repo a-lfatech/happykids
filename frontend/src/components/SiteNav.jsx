@@ -23,7 +23,7 @@ export const SiteNav = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { pdata } = useAppState();
-  const go = (to) => { setOpen(false); navigate(to); };
+  const go = (to) => { setOpen(false); navigate(to); if (to === "/#worlds") setTimeout(() => document.getElementById("worlds")?.scrollIntoView({ behavior: "smooth" }), 350); };
   return (
     <nav className="relative z-30 px-4 pt-3 sm:px-8" data-testid="site-nav">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 rounded-[1.75rem] border-[3px] border-hc-navy bg-white/90 px-3 py-2 backdrop-blur-md sm:px-5" style={{ boxShadow: "0 5px 0 #1F2547" }}>
@@ -31,7 +31,7 @@ export const SiteNav = () => {
         <ul className="hidden items-center gap-1 lg:flex">
           {LINKS.map((l) => (
             <li key={l.id}>
-              <NavLink to={l.to} end data-testid={`nav-${l.id}`} className="toy-focus rounded-full px-3 py-2 font-fredoka text-base font-semibold transition-colors hover:bg-hc-sunlight">
+              <NavLink to={l.to} end data-testid={`nav-${l.id}`} onClick={() => { if (l.id === "worlds") document.getElementById("worlds")?.scrollIntoView({ behavior: "smooth" }); }} className="toy-focus rounded-full px-3 py-2 font-fredoka text-base font-semibold transition-colors hover:bg-hc-sunlight">
                 {l.label}
               </NavLink>
             </li>

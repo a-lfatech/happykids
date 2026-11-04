@@ -1,25 +1,21 @@
-# HOP & COUNT – PRD
+# HappyKids (formerly Hop & Count) – PRD
 ## Original problem
-Premium interactive early-learning maths app for K–Grade 1 (numbers 1–10), based on a Grade 1 worksheet: Missing Numbers (6 puzzles) and More or Less (8 puzzles), characters Hoppy (bunny), Froggy (frog), Sunny (chick), speech bubbles, TTS, optional voice listening ("thank you"), stars for first-try, celebration screen, grown-up corner, local progress.
+v1: Hop & Count maths app (K–G1, numbers 1–10). v2: upgrade to HappyKids platform per user's HappyKids prompt + poster: landing page, learning dashboard, 5 learning worlds, rewards, parent dashboard, about, privacy/terms. Reading ideas (user's Lovable "Little Readers" app was not accessible; reading built from spec).
 
-## User choices
-- Number line: 6 boxes around the question
-- Characters: hand-built vector (SVG) cartoons with expressions
-- Grown-up gate: press & hold 3 seconds
-- Future: will also teach reading; Brilliant.org-style learn-by-doing
+## Choices
+- 6-box number line; grown-up gate = press & hold 3s
+- Poster-style 3D character PNGs (Hoppy, Froggy, Sunny, Ellie elephant, Finn fox) in /frontend/public/hk
+- All five worlds with starter games; Emergent Google sign-in for parents only (cloud backup), kids play without accounts
 
-## Architecture (frontend only, React + Tailwind + Framer Motion)
-- games/logic.js (puzzles + math validation), games/registry.js (module list for future games)
-- lib/audioManager.js (Web Audio chimes, Web Speech TTS, 3s no-voice detection), lib/speechRecognitionManager.js (6s on-demand listening, nothing stored)
-- context/AppState.jsx (localStorage `hopcount_progress_v1`), hooks/useGameSession, useVoice
-- pages: Home, MissingNumbersGame, MoreOrLessGame, AchievementScreen, ParentDashboard
+## Architecture
+- Frontend React: data/worlds.js (worlds, activities, badges), data/quizzes.js, data/stories.js; QuizCore generic engine; StoryGame (read-along highlight), MemoryGame, DrawGame, ColourGame, Missing Numbers, More or Less; AppState (profiles, progress, settings, cloud sync)
+- Backend FastAPI: /api/auth/session|me|logout, /api/progress GET/PUT, /api/contact
 
-## Implemented (Nov 2026)
-- All 14 puzzles, any-order blank filling, progressive hints, hop arcs w/ arrowheads & hop numbers, auto-hop on correct
-- Progress dots (todo/current/done/star), session + lifetime stars, end screen, leave-game confirm
-- Parent dashboard: stats, practice areas, objectives, sound/speech/mic/volume, reset
-- Tested: 100% flows pass (iteration_1)
+## Implemented
+- 2026-11: v1 Hop & Count (14 puzzles), tested
+- 2026-11: v2 HappyKids: 16 activities across 5 worlds, badges/certificates/avatar unlocks, profiles + levels, parent dashboard, Google cloud backup, music, reduced motion, about/contact, legal pages. Tested iteration_2 (backend 16/16, frontend ~96%, issues fixed)
+- 2026-11: More or Less hop coaching (counts remaining hops, back-hops remove arrows, caps at required hops)
 
 ## Backlog
-- P1: Reading module (phonics/sight words) using registry; counting to 20
-- P2: multiple child profiles, recorded voices, printable worksheets, teacher mode
+- P1: Recorded character voices; more reading (sight words, sentence building); counting to 20
+- P2: Teacher/classroom mode, printable worksheets, more science topics

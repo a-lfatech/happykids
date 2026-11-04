@@ -31,6 +31,7 @@ export default function DrawGame({ activity }) {
   const canvas = useRef(null);
   const drawing = useRef(false);
   const history = useRef([]);
+  const inked = useRef(false);
   const [colour, setColour] = useState(PALETTE[4]);
   const [size, setSize] = useState(SIZES[1]);
   const [eraser, setEraser] = useState(false);
@@ -39,7 +40,7 @@ export default function DrawGame({ activity }) {
   const voice = useVoice((cmd) => { if (cmd === "next" && s.solved) s.next(); else voice.say(CHALLENGES[s.index]); });
 
   const ctx = () => canvas.current.getContext("2d");
-  const clear = () => { const c = canvas.current; const x = ctx(); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height); };
+  const clear = () => { const c = canvas.current; const x = ctx(); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height); inked.current = false; };
 
   useEffect(() => {
     const c = canvas.current;
@@ -62,6 +63,7 @@ export default function DrawGame({ activity }) {
     const c = canvas.current;
     history.current = [...history.current.slice(-19), ctx().getImageData(0, 0, c.width, c.height)];
     drawing.current = true;
+    if (!eraser) inked.current = true;
     const x = ctx(); const [px, py] = pos(e);
     x.strokeStyle = eraser ? "#fff" : colour.hex; x.lineWidth = size * 2; x.lineCap = "round"; x.lineJoin = "round";
     x.beginPath(); x.moveTo(px, py); x.lineTo(px + 0.1, py + 0.1); x.stroke();
@@ -72,6 +74,7 @@ export default function DrawGame({ activity }) {
   const save = () => { const a = document.createElement("a"); a.download = "happykids-drawing.png"; a.href = canvas.current.toDataURL("image/png"); a.click(); };
   const done = () => {
     if (s.solved) return;
+    if (!inked.current) { const m = "Your page is still empty! Draw something first, then tap I did it."; setText(m); voice.say(m); return; }
     s.registerCorrect(true);
     const msg = "Congratulations! What a wonderful drawing! You're a creative genius!";
     setMood("celebrate"); setText(msg); sfx.correct(); voice.say(msg, { listenAfter: true });

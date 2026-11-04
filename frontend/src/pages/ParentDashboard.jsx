@@ -35,7 +35,10 @@ const Gate = ({ onOpen }) => (
 );
 
 // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
-const signIn = () => { window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(window.location.origin + "/parents")}`; };
+const signIn = () => {
+  sessionStorage.setItem("hc_grownup_return", "1");
+  window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(window.location.origin + "/parents")}`;
+};
 
 const AccountCard = () => {
   const { user, logout, cloud } = useAppState();
@@ -93,7 +96,7 @@ const ProfilesCard = () => {
         </select>
         <ToyButton type="submit" color="mint" data-testid="add-profile-button"><Plus className="h-5 w-5" /> Add</ToyButton>
       </form>
-      <p className="mt-2 text-xs font-bold opacity-70">Kindergarten shows 3 answer choices; Grade 1 shows up to 4 and unlocks every story.</p>
+      <p className="mt-2 text-xs font-bold opacity-70">Kindergarten keeps picture questions to 3 choices and suggests gentler activities first; Grade 1 can be suggested every activity, including all stories.</p>
     </section>
   );
 };
@@ -102,9 +105,13 @@ const skillFor = (id, idx) => (id === "missing-numbers" || id === "more-or-less"
 
 export default function ParentDashboard() {
   const { profile, pdata, resetProgress } = useAppState();
-  const [open, setOpen] = useState(sessionStorage.getItem("hc_grownup") === "1");
+  const [open, setOpen] = useState(() => {
+    const back = sessionStorage.getItem("hc_grownup_return") === "1";
+    sessionStorage.removeItem("hc_grownup_return");
+    return back;
+  });
   const [confirm, setConfirm] = useState(false);
-  const unlock = () => { sessionStorage.setItem("hc_grownup", "1"); setOpen(true); };
+  const unlock = () => setOpen(true);
 
   if (!open) return <PageShell testId="parents-locked"><Gate onOpen={unlock} /></PageShell>;
 

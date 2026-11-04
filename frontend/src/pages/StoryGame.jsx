@@ -52,7 +52,7 @@ const StoryReader = ({ story, onDone, backTo }) => {
           <div>
             <p className="font-fredoka text-3xl font-semibold leading-snug sm:text-5xl" data-testid="story-text">
               {words.map((w, i) => (
-                <button type="button" key={i} onClick={() => speak(w.replace(/[^\w']/g, ""))} data-testid={`story-word-${i}`} className={`toy-focus mr-2 inline-block rounded-xl px-1 transition-colors duration-150 ${i === word ? "bg-hc-sun" : "hover:bg-white/70"}`}>{w}</button>
+                <span key={i}><button type="button" onClick={() => speak(w.replace(/[^\w']/g, ""))} data-testid={`story-word-${i}`} className={`toy-focus inline-block rounded-xl px-1 transition-colors duration-150 ${i === word ? "bg-hc-sun" : "hover:bg-white/70"}`}>{w}</button>{" "}</span>
               ))}
             </p>
             <p className="mt-3 text-sm font-bold opacity-70">Tap any word to hear it.</p>

@@ -43,7 +43,7 @@ const Hero = () => {
         </div>
 
         <div className="relative mx-auto mt-10 h-[240px] max-w-3xl sm:h-[360px]" aria-label="Hoppy, Froggy, Sunny, Ellie and Finn around a storybook">
-          <img src="/hk/storybook.png" alt="" className="absolute bottom-0 left-1/2 z-20 w-[60%] -translate-x-1/2" />
+          <img src="/hk/storybook.png" alt="" className="absolute bottom-0 left-1/2 z-20 w-[60%] -translate-x-1/2" style={{ WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 30%)", maskImage: "linear-gradient(to bottom, transparent 0%, black 30%)" }} />
           <img src="/hk/hoppy.png" alt="Hoppy" className="hc-float absolute bottom-[16%] left-1/2 z-10 w-[22%] -translate-x-1/2" />
           <img src="/hk/ellie.png" alt="Ellie" className="absolute bottom-[10%] left-[4%] z-0 w-[24%]" />
           <img src="/hk/finn.png" alt="Finn" className="absolute bottom-0 left-[0%] z-30 w-[19%]" />
