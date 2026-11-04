@@ -1,0 +1,26 @@
+{
+  "summary": "Frontend-only test of the PlaygroundScene swings and say-hello hotspots at 1920 and 390. Passed: playground-scene renders and hero-playground loads (/hk/playground_base.jpg, 1264x848). swing-blue and swing-red transforms change over time, each within about ±7deg (rotation matrix sin up to 0.12), and the two swings are out of phase. Visually, both swings hang on the A-frame at the right of the picture and no painted-out swings show through. All 5 hotspots (ellie/hoppy/finn/froggy/sunny) are <button>s with aria-label 'Say hello to X'. Each one, when clicked, shows scene-hello-bubble with the correct name and greeting. Clicking another friend replaces the bubble (only 1 exists at a time). The bubble is gone 4.8s after the last click. Hotspots can be reached with focus/Tab, and pressing Enter shows the bubble. Visually, the hotspots cover the right character. No horizontal scroll at 390 (scrollWidth 390), even while a bubble is open. hero-start-learning goes to /learn, and hero-explore-worlds scrolls to worlds (top 112px). The audio-help note appears, which was expected. FAILED: at 390px, Hoppy's bubble spills past the top of the picture and gets clipped. The parent frame has overflow:hidden. Bubble top is 285px while the scene top is 306.5px, so about 21px is cut off and the name 'Hoppy' is half hidden. At 1920 all 5 bubbles stay inside the picture. At 390 the other 4 bubbles (Ellie, Finn, Froggy, Sunny) stay inside, and the text is 12px and readable.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "PlaygroundScene hello bubble (Hoppy, mobile <640px)", "issue": "The bubble is placed above the hotspot top (y=285 of 848, i.e. 33.6% of 233px, about 78px). It is about 91px tall at 390 (w-44, 4 lines), so it runs about 21px past the top of the picture and is clipped by the parent's overflow-hidden. The name 'Hoppy' is cut off. Fix: clamp the bubble inside the picture, e.g. flip Hoppy's bubble below the top or place it inside/next to the hotspot (top-based placement), use a smaller per-friend y on mobile, or clamp with max(...) so the top stays >= 4px.", "selector": "[data-testid=scene-hello-bubble]", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Hero playground", "issues": ["On touch devices, hover:bg-white/15 on the hotspots can stick after a tap (a faint white oval stays on the friend). Consider limiting it with @media (hover:hover) or using focus-visible only.", "At 1920, Froggy's and Sunny's bubbles cover Finn's face while they are showing. Acceptable, but they could be moved up or to the right."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": ["Keep scene-hello-bubble inside the picture at 390px for Hoppy (currently about 21px is clipped at the top, which cuts off the name)"],
+  "critical_code_review_comments": [
+    "The bubble is placed with bottom = (848 - y)/848 and no clamping, so any friend near the top overflows on small screens, where the bubble is tall relative to the picture. Add a clamp or flip logic.",
+    "Hotspot percentages assume the image is not cropped. The image is object-cover and the SVG uses slice on a 3:2 box while the image ratio is 1.49, which gives under 1% drift. That is fine, but if the aspect ratio ever changes, the hotspots and swings will drift apart from each other.",
+    "The timer is not cleared on unmount. Add a useEffect cleanup with clearTimeout(timer.current) to avoid a setState after unmount."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "about 92% (1 failure: Hoppy bubble clipped at 390)"},
+  "seed_data_creation": "none",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "To check whether a bubble is inside the picture, compare getBoundingClientRect of scene-hello-bubble with playground-scene in the same evaluate call. The page scrolls on click, so a stale bounding box gives false failures. Scroll the scene into view with block:center first. At 390, Hoppy's bubble top was 285 against a scene top of 306.5."
+}

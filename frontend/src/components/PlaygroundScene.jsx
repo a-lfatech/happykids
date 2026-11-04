@@ -8,8 +8,8 @@ const FRIENDS = [
   { id: "ellie", name: "Ellie", x: 150, y: 385, w: 310, h: 360, shift: "-25%", hello: "Hello! I'm Ellie the Elephant. I love drawing and colouring!" },
   { id: "hoppy", name: "Hoppy", x: 520, y: 285, w: 240, h: 375, shift: "-50%", hello: "Hi there! I'm Hoppy the Bunny. Let's find missing numbers and read stories!" },
   { id: "finn", name: "Finn", x: 780, y: 375, w: 160, h: 265, shift: "-55%", hello: "Hey! I'm Finn the Fox. I love letter sounds and animal facts!" },
-  { id: "froggy", name: "Froggy", x: 880, y: 555, w: 140, h: 195, shift: "-60%", hello: "Ribbit! I'm Froggy. Let's hop forward and backward on the number line!" },
-  { id: "sunny", name: "Sunny", x: 1005, y: 545, w: 175, h: 215, shift: "-80%", hello: "Cheep cheep! I'm Sunny the Chick. Let's play and learn together!" },
+  { id: "froggy", name: "Froggy", x: 880, y: 555, w: 140, h: 195, shift: "-20%", hello: "Ribbit! I'm Froggy. Let's hop forward and backward on the number line!" },
+  { id: "sunny", name: "Sunny", x: 1005, y: 545, w: 175, h: 215, shift: "-78%", hello: "Cheep cheep! I'm Sunny the Chick. Let's play and learn together!" },
 ];
 const SWINGS = [
   { id: "blue", px: 1048.5, l: 1028, r: 1069, seat: "#3A9BEA", light: "#8FD0FF", delay: "0s" },
@@ -54,7 +54,7 @@ export const PlaygroundScene = () => {
           onClick={() => hello(f)}
           aria-label={`Say hello to ${f.name}`}
           data-testid={`scene-friend-${f.id}`}
-          className="toy-focus group absolute rounded-[40%] transition-colors duration-200 hover:bg-white/15"
+          className="toy-focus group absolute rounded-[40%] transition-colors duration-200 [@media(hover:hover)]:hover:bg-white/15"
           style={{ left: pct(f.x, 1264), top: pct(f.y, 848), width: pct(f.w, 1264), height: pct(f.h, 848), cursor: "pointer" }}
         >
           {active?.id === f.id && (
@@ -70,7 +70,7 @@ export const PlaygroundScene = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             className="pointer-events-none absolute z-10 w-44 rounded-2xl border-[3px] border-hc-navy bg-white p-2 text-left sm:w-64 sm:p-3"
-            style={{ left: pct(active.x + active.w / 2, 1264), bottom: `calc(${pct(848 - active.y, 848)} + 8px)`, x: active.shift, boxShadow: "0 4px 0 #1F2547" }}
+            style={{ left: pct(active.x + active.w / 2, 1264), top: `max(6px, calc(${pct(active.y, 848)} - 6.5rem))`, x: active.shift, boxShadow: "0 4px 0 #1F2547" }}
             data-testid="scene-hello-bubble"
           >
             <p className="font-fredoka text-sm font-bold sm:text-lg">{active.name}</p>
