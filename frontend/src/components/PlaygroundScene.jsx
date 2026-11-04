@@ -8,8 +8,8 @@ const FRIENDS = [
   { id: "ellie", name: "Ellie", x: 150, y: 385, w: 310, h: 360, shift: "-25%", hello: "Hello! I'm Ellie the Elephant. I love drawing and colouring!" },
   { id: "hoppy", name: "Hoppy", x: 520, y: 285, w: 240, h: 375, shift: "-50%", hello: "Hi there! I'm Hoppy the Bunny. Let's find missing numbers and read stories!" },
   { id: "finn", name: "Finn", x: 780, y: 375, w: 160, h: 265, shift: "-55%", hello: "Hey! I'm Finn the Fox. I love letter sounds and animal facts!" },
-  { id: "froggy", name: "Froggy", x: 880, y: 555, w: 140, h: 195, shift: "-20%", hello: "Ribbit! I'm Froggy. Let's hop forward and backward on the number line!" },
-  { id: "sunny", name: "Sunny", x: 1005, y: 545, w: 175, h: 215, shift: "-78%", hello: "Cheep cheep! I'm Sunny the Chick. Let's play and learn together!" },
+  { id: "froggy", name: "Froggy", x: 880, y: 555, w: 140, h: 195, shift: "-20%", anchor: "bottom", hello: "Ribbit! I'm Froggy. Let's hop forward and backward on the number line!" },
+  { id: "sunny", name: "Sunny", x: 1005, y: 545, w: 175, h: 215, shift: "-78%", anchor: "bottom", hello: "Cheep cheep! I'm Sunny the Chick. Let's play and learn together!" },
 ];
 const SWINGS = [
   { id: "blue", px: 1048.5, l: 1028, r: 1069, seat: "#3A9BEA", light: "#8FD0FF", delay: "0s" },
@@ -33,16 +33,21 @@ const Swing = ({ s }) => (
 export const PlaygroundScene = () => {
   const [active, setActive] = useState(null);
   const timer = useRef(null);
+  const box = useRef(null);
   const hello = (f) => {
     sfx.tap();
     speak(f.hello);
-    setActive({ ...f, k: Date.now() });
+    const W = box.current.clientWidth;
+    const bw = W < 640 ? 176 : 256;
+    const cx = ((f.x + f.w / 2) / 1264) * W;
+    const left = Math.min(Math.max(6, cx - bw * (parseFloat(f.shift) / -100)), W - bw - 6);
+    setActive({ ...f, left, k: Date.now() });
     clearTimeout(timer.current);
     timer.current = setTimeout(() => setActive(null), 4000);
   };
 
   return (
-    <div className="relative aspect-[3/2] w-full" data-testid="playground-scene">
+    <div ref={box} className="relative aspect-[3/2] w-full" data-testid="playground-scene">
       <img src="/hk/playground_base.jpg" alt="Hoppy, Ellie, Finn, Froggy and Sunny around a magical storybook in a sunny playground" className="absolute inset-0 h-full w-full object-cover" data-testid="hero-playground" draggable="false" />
       <svg viewBox="0 0 1264 848" preserveAspectRatio="xMidYMid slice" className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
         {SWINGS.map((s) => <Swing key={s.id} s={s} />)}
@@ -68,9 +73,8 @@ export const PlaygroundScene = () => {
             key={active.k}
             initial={{ opacity: 0, y: 10, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
             className="pointer-events-none absolute z-10 w-44 rounded-2xl border-[3px] border-hc-navy bg-white p-2 text-left sm:w-64 sm:p-3"
-            style={{ left: pct(active.x + active.w / 2, 1264), top: `max(6px, calc(${pct(active.y, 848)} - 6.5rem))`, x: active.shift, boxShadow: "0 4px 0 #1F2547" }}
+            style={{ left: active.left, ...(active.anchor === "bottom" ? { bottom: 6 } : { top: `max(6px, calc(${pct(active.y, 848)} - 6.5rem))` }), boxShadow: "0 4px 0 #1F2547" }}
             data-testid="scene-hello-bubble"
           >
             <p className="font-fredoka text-sm font-bold sm:text-lg">{active.name}</p>
@@ -78,7 +82,7 @@ export const PlaygroundScene = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      <span className="pointer-events-none absolute bottom-3 right-3 hidden items-center gap-1.5 rounded-full border-[3px] border-hc-navy bg-white/90 px-3 py-1 font-fredoka text-sm font-semibold sm:flex" aria-hidden="true">
+      <span className="pointer-events-none absolute right-3 top-3 hidden items-center gap-1.5 rounded-full border-[3px] border-hc-navy bg-white/90 px-3 py-1 font-fredoka text-sm font-semibold sm:flex" aria-hidden="true">
         <Hand className="h-4 w-4" strokeWidth={2.5} /> Tap a friend to say hello!
       </span>
     </div>

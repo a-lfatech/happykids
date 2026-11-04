@@ -1,0 +1,28 @@
+{
+  "summary": "Frontend-only retest of the PlaygroundScene hello bubbles at 390 and 1920. The Hoppy fix works: at 390 Hoppy's bubble top is 311.5 and the scene top is 305.5, so the name and greeting are fully visible. NEW REGRESSION: at 390, Froggy's bubble spills past the right edge. Bubble right is 423.8 and scene right is 370, so about 54px is cut off and the greeting is truncated ('Ribbit! I'm Froggy. L...'). Bounds at 390: Ellie, Hoppy, Finn and Sunny PASS; Froggy FAIL. At 1920 all 5 bubbles are inside the scene (PASS). Visual check at 1920: Froggy's and Sunny's bubbles still cover part of Finn's face. Sunny's bubble (left 1130) covers Finn's muzzle and the lower part of his eye. Froggy's bubble (top 541) covers the right side of Finn's face and chin. Small improvement, but not fixed. Also passed: swing-blue and swing-red transforms change over time at both sizes. Hotspots can be focused, and pressing Enter shows Finn's bubble. scrollWidth stays at 390 at 390px, even with Froggy's bubble overflowing, because the parent clips it. Text size is 14px/12px at mobile and 18px/14px at desktop.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "PlaygroundScene hello bubble (Froggy, <640px)", "issue": "Froggy's bubble is clipped about 54px on the right at 390. The bubble is centred at 75.2% of the scene (x 880+70 of 1264) and shifted only -20% of its width (176px), so it ends 54px past the right edge. The context note says left is JS-clamped in px, but PlaygroundScene.jsx has no JS clamp: it still uses left: pct(...) plus a fixed per-friend x shift. Fix: measure the scene and bubble widths (ref + getBoundingClientRect / ResizeObserver) and clamp left to [pad, sceneW - bubbleW - pad], or use a smaller shift for Froggy on mobile (about -55% or less).", "selector": "[data-testid=scene-hello-bubble]", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Hero playground 1920", "issues": ["Sunny's bubble (top 533, left 1130) still covers Finn's muzzle and eye.", "Froggy's bubble (top 541, left 1164) still covers the right side of Finn's face. Consider placing both bubbles below or to the right of Finn's head (e.g. top around 60% of the scene, or anchored to the right edge) so Finn's face (about 780-940 x 400-560 in picture px) stays clear."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Clamp the bubble's horizontal position inside the scene. Froggy at 390 overflows the right edge by about 54px. The JS clamp described in the note is not in PlaygroundScene.jsx.",
+    "At 1920, move Froggy's and Sunny's bubbles so they don't cover Finn's face."
+  ],
+  "critical_code_review_comments": [
+    "The bubble's horizontal position uses fixed percentage shifts, which give different pixel offsets at each breakpoint because the bubble width changes (w-44 vs w-64). Measure and clamp in px instead.",
+    "The timer is still not cleared on unmount. Add a useEffect cleanup that calls clearTimeout(timer.current)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "about 85% (9/10 bubble bound checks pass; Froggy at 390 fails; Finn's face overlap at 1920 remains)"},
+  "seed_data_creation": "none",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Wait about 800ms after the click so the framer-motion scale animation settles, then compare getBoundingClientRect of the bubble and the scene in one evaluate call, after scrollIntoView with block:center. Scene at 390 is 20..370 x 305.5..538.8; at 1920 it is 452..1468 x 201.8..879.1."
+}
