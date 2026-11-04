@@ -5,6 +5,14 @@ const I = (icon, color, label) => ({ icon, color, label });
 const S = (shape, fill, label) => ({ shape, fill, label });
 
 export const QUIZZES = {
+  "count-the-stars": [3, 5, 2, 7, 4, 6].map((n) => ({
+    title: "How many stars?",
+    say: "Count the stars with me. Touch each one as you count. How many stars are there?",
+    show: Array.from({ length: n }, () => I("Star", "sun")),
+    choices: [T(String(n)), T(String(n + 1)), T(String(n - 1))],
+    explain: `${Array.from({ length: n }, (_, i) => i + 1).join(", ")}. There are ${n} stars!`,
+    hint: "Touch each star once and count out loud: 1, 2, 3...",
+  })),
   "alphabet-adventures": [
     { title: "Find little b!", say: "This is big B. Can you find little b?", show: [T("B")], choices: [T("b"), T("d"), T("p")], explain: "Big B and little b are the same letter. B says buh!", hint: "Little b has a tall line with a round tummy on the right." },
     { title: "Find little m!", say: "This is big M. Can you find little m?", show: [T("M")], choices: [T("m"), T("n"), T("w")], explain: "Big M and little m! M says mmm.", hint: "Little m has two humps, like two little hills." },

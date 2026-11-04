@@ -19,9 +19,9 @@ const Stat = ({ label, value, testId, bg }) => (
 
 const OBJECTIVES = {
   "hop-and-count": "Counting forward and backward 1–10, missing numbers, one/two more and less.",
-  "read-and-shine": "Upper and lowercase letters, beginning sounds, CVC words, listening comprehension.",
+  "read-and-shine": "Upper and lowercase letters, letter names and sounds, blending CVC words, simple sentences, listening comprehension.",
   "think-and-play": "Patterns, sorting, odd one out, shapes and visual memory.",
-  "create-and-explore": "Colour names, following instructions, fine motor drawing.",
+  "create-and-explore": "Colour names, following instructions, tracing letters and numbers, fine motor drawing.",
   "little-discoverers": "Animal homes, senses and body, weather, sky and plant needs.",
 };
 

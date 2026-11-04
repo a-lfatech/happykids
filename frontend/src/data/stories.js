@@ -3,6 +3,21 @@ const C = (img, label) => ({ img, label });
 const S = (shape, fill, label) => ({ shape, fill, label });
 
 export const STORIES = {
+  "little-sentences": {
+    title: "Little Sentences",
+    pages: [
+      { text: "The cat sat on a mat.", img: "/hk/finn.png", icon: "Cat", bg: "bg-hc-tanglight" },
+      { text: "The dog can run and run.", img: "/hk/froggy.png", icon: "Dog", bg: "bg-hc-sunlight" },
+      { text: "The sun is hot.", img: "/hk/sunny.png", icon: "Sun", bg: "bg-hc-sunlight" },
+      { text: "I can see a big red bus.", img: "/hk/ellie.png", icon: "Bus", bg: "bg-hc-skylight" },
+      { text: "A fox sat in a box.", img: "/hk/finn.png", icon: "Box", bg: "bg-hc-mintlight" },
+    ],
+    questions: [
+      { title: "Who sat on the mat?", say: "Who sat on the mat?", choices: [I("Cat", "tang", "the cat"), I("Dog", "sun", "the dog"), I("Bus", "sky", "the bus")], explain: "The cat sat on a mat!", hint: "Look back at the first sentence: The cat sat..." },
+      { title: "What is hot?", say: "What is hot?", choices: [I("Sun", "sun", "the sun"), I("Snowflake", "sky", "snow"), I("Fish", "sky", "a fish")], explain: "The sun is hot!", hint: "It shines in the sky." },
+      { title: "What colour was the bus?", say: "What colour was the big bus?", choices: [S("circle", "#F0484E", "red"), S("circle", "#3B9BEA", "blue"), S("circle", "#3DBE6A", "green")], explain: "I can see a big red bus!", hint: "Read the bus sentence again: a big ... bus." },
+    ],
+  },
   "hoppys-lost-carrot": {
     title: "Hoppy's Lost Carrot",
     pages: [
