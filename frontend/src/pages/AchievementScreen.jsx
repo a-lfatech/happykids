@@ -1,21 +1,21 @@
 import { useEffect } from "react";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Gamepad2, Home, RotateCcw, Star } from "lucide-react";
+import { Award, Gamepad2, Home, RotateCcw, Star } from "lucide-react";
 import { Character } from "../components/Characters";
 import { Confetti } from "../components/Confetti";
 import { ToyButton } from "../components/ToyButton";
-import { GAMES, gameById } from "../games/registry";
+import { activityById, worldById } from "../data/worlds";
 import { sfx, speak } from "../lib/audioManager";
 
 export default function AchievementScreen() {
   const { gameId } = useParams();
   const { state } = useLocation();
   const navigate = useNavigate();
-  const game = gameById(gameId);
+  const game = activityById(gameId);
+  const world = game && worldById(game.world);
   const results = state?.results;
   const stars = results ? results.filter((r) => r?.star).length : 0;
-  const other = GAMES.find((g) => g.id !== gameId);
 
   useEffect(() => {
     if (!results) return;
@@ -57,17 +57,19 @@ export default function AchievementScreen() {
         </div>
 
         <div className="mt-8 grid w-full gap-4 sm:grid-cols-3">
-          <ToyButton color="mint" className="min-h-[68px] text-xl" onClick={() => navigate(game.path)} data-testid="play-again-button">
+          <ToyButton color="mint" className="min-h-[68px] text-xl" onClick={() => navigate(`/play/${game.id}`)} data-testid="play-again-button">
             <RotateCcw className="h-6 w-6" strokeWidth={3} /> PLAY AGAIN
           </ToyButton>
-          <ToyButton color="sky" className="min-h-[68px] text-xl" onClick={() => navigate(other.path)} data-testid="more-games-button">
+          <ToyButton color="sky" className="min-h-[68px] text-xl" onClick={() => navigate(`/world/${game.world}`)} data-testid="more-games-button">
             <Gamepad2 className="h-6 w-6" strokeWidth={3} /> MORE GAMES
           </ToyButton>
-          <ToyButton color="sun" className="min-h-[68px] text-xl" onClick={() => navigate("/")} data-testid="back-home-button">
+          <ToyButton color="sun" className="min-h-[68px] text-xl" onClick={() => navigate("/learn")} data-testid="back-home-button">
             <Home className="h-6 w-6" strokeWidth={3} /> BACK HOME
           </ToyButton>
         </div>
-        <p className="mt-3 text-sm font-bold opacity-70">More games: try {other.title} with {other.companion}!</p>
+        <div className="mt-6 inline-flex items-center gap-3 rounded-full border-[3px] border-hc-navy bg-hc-sunlight px-5 py-2 font-fredoka text-lg font-bold" data-testid="badge-earned">
+          <Award className="h-6 w-6" strokeWidth={2.5} /> {world.badge.name} badge earned!
+        </div>
       </div>
     </main>
   );

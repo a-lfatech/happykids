@@ -8,7 +8,7 @@ import { ProgressDots } from "./ProgressDots";
 import { ToyButton } from "./ToyButton";
 import { Character } from "./Characters";
 
-export const GameTopBar = ({ statuses, stars, onMicOn, onMicOff, character }) => {
+export const GameTopBar = ({ statuses, stars, onMicOn, onMicOff, character, backTo = "/learn" }) => {
   const navigate = useNavigate();
   const { state, updateSettings } = useAppState();
   const [leaving, setLeaving] = useState(false);
@@ -22,8 +22,8 @@ export const GameTopBar = ({ statuses, stars, onMicOn, onMicOff, character }) =>
 
   return (
     <header className="flex flex-wrap items-center justify-between gap-3">
-      <ToyButton color="white" onClick={() => setLeaving(true)} data-testid="game-back-button" aria-label="Back to home" className="px-3 sm:px-4">
-        <ArrowLeft className="h-6 w-6" strokeWidth={3} /> <span className="hidden sm:inline">Home</span>
+      <ToyButton color="white" onClick={() => setLeaving(true)} data-testid="game-back-button" aria-label="Leave game" className="px-3 sm:px-4">
+        <ArrowLeft className="h-6 w-6" strokeWidth={3} /> <span className="hidden sm:inline">Back</span>
       </ToyButton>
       <div className="order-3 flex w-full justify-center sm:order-none sm:w-auto">
         <ProgressDots statuses={statuses} />
@@ -46,7 +46,7 @@ export const GameTopBar = ({ statuses, stars, onMicOn, onMicOff, character }) =>
           <p className="mt-2 font-bold text-lg">Your stars are saved. You can come back any time!</p>
           <div className="mt-6 flex w-full flex-col gap-3 sm:flex-row">
             <ToyButton color="mint" className="flex-1 text-xl" onClick={() => setLeaving(false)} data-testid="keep-playing-button">Keep playing</ToyButton>
-            <ToyButton color="white" className="flex-1 text-xl" onClick={() => navigate("/")} data-testid="confirm-leave-button"><Home className="h-5 w-5" strokeWidth={3} /> Go home</ToyButton>
+            <ToyButton color="white" className="flex-1 text-xl" onClick={() => navigate(backTo)} data-testid="confirm-leave-button"><Home className="h-5 w-5" strokeWidth={3} /> Leave</ToyButton>
           </div>
         </div>
       </Modal>

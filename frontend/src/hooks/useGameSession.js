@@ -23,9 +23,9 @@ export default function useGameSession(gameId, total) {
 
   const registerWrong = () => { markAttempt(); setWrongs(wrongs + 1); return wrongs + 1; };
 
-  const registerCorrect = () => {
+  const registerCorrect = (forceStar) => {
     markAttempt();
-    const star = wrongs === 0;
+    const star = forceStar ?? wrongs === 0;
     setResults((r) => r.map((x, i) => (i === index ? { star } : x)));
     recordComplete(gameId, index, star, wrongs);
     setSolved(true);

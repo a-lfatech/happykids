@@ -78,7 +78,22 @@ export const stopSpeaking = () => {
   synth()?.cancel();
 };
 
-export const speak = (text, { onEnd } = {}) => {
+let musicTimer = null;
+const TUNE = [523, 659, 784, 659, 587, 698, 880, 698, 523, 659, 784, 1046, 880, 784, 659, 587];
+export const setMusic = (on) => {
+  clearInterval(musicTimer);
+  musicTimer = null;
+  if (!on) return;
+  let i = 0;
+  musicTimer = setInterval(() => {
+    if (!ctx || ctx.state !== "running" || synth()?.speaking) return;
+    tone(TUNE[i % TUNE.length], 0, 0.5, { type: "sine", gain: 0.05 });
+    if (i % 4 === 0) tone(TUNE[i % TUNE.length] / 2, 0, 1.2, { type: "sine", gain: 0.035 });
+    i++;
+  }, 520);
+};
+
+export const speak = (text, { onEnd, onBoundary, onStart } = {}) => {
   const s = synth();
   if (!cfg.speech || !s) { onEnd?.(); return; }
   const id = ++speakId;
@@ -93,7 +108,8 @@ export const speak = (text, { onEnd } = {}) => {
   u.volume = cfg.volume;
   let started = false;
   failTimer = setTimeout(() => { if (!started && id === speakId) failCb?.(); }, 3000);
-  u.onstart = () => { started = true; clearTimeout(failTimer); };
+  u.onstart = () => { started = true; clearTimeout(failTimer); onStart?.(); };
+  u.onboundary = (e) => { if (id === speakId && e.name !== "sentence") onBoundary?.(e.charIndex); };
   u.onend = () => { if (id === speakId) { clearTimeout(failTimer); onEnd?.(); } };
   u.onerror = (e) => {
     if (id !== speakId || e.error === "interrupted" || e.error === "canceled") return;

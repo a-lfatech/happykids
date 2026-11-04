@@ -96,3 +96,8 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .hc-float, .hc-blink, .hc-pulse { animation: none; }
 }
+
+.reduce-motion *, .reduce-motion *::before, .reduce-motion *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+.hk-sky { background: linear-gradient(180deg, #BFE6FF 0%, #E4F5FF 45%, #FFF6E3 100%); }
+@keyframes hk-drift { 0% { transform: translateX(-10%); } 100% { transform: translateX(110vw); } }
+.hk-cloud { animation: hk-drift 60s linear infinite; }

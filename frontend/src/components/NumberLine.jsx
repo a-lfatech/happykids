@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, Flag } from "lucide-react";
-import { Froggy } from "./Characters";
 
 const NAVY = "#1F2547";
 const cx = (i) => i * 100 + 50;
@@ -86,7 +85,7 @@ export const NumberLine = ({ numbers, start, frogAt, hops, onTap, shake, answer,
             data-at={frogAt}
           >
             <motion.div key={hops.length} initial={{ y: 0 }} animate={{ y: [0, -70, 0] }} transition={{ duration: 0.45, ease: "easeOut" }}>
-              <Froggy mood={solved ? "celebrate" : "happy"} />
+              <img src="/hk/froggy.png" alt="" className="w-full" draggable="false" />
             </motion.div>
           </motion.div>
         </div>

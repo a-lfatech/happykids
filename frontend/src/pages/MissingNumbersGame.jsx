@@ -112,7 +112,7 @@ export default function MissingNumbersGame() {
   return (
     <main className="hc-bg min-h-screen px-4 pb-10 pt-4 sm:px-8" data-testid="missing-numbers-game">
       <div className="mx-auto max-w-5xl">
-        <GameTopBar statuses={s.statuses} stars={s.sessionStars} character="hoppy" onMicOn={() => voice.listen(true)} onMicOff={voice.stop} />
+        <GameTopBar statuses={s.statuses} stars={s.sessionStars} character="hoppy" backTo="/world/hop-and-count" onMicOn={() => voice.listen(true)} onMicOff={voice.stop} />
         {voice.micDenied && <p className="mt-3 rounded-xl bg-white p-2 text-center text-sm font-bold" data-testid="mic-denied-note">Microphone is off. You can keep playing by tapping!</p>}
         <section className="mt-6 sm:mt-8">
           <SpeechPanel character="hoppy" mood={mood} title={title} text={text} tone={phase === "correct" ? "correct" : phase === "wrong" ? "wrong" : "neutral"} onListen={() => voice.say(phase === "question" ? intro : `${intro} ${text}`, { listenAfter: phase !== "question" })} listening={voice.listening} onStopListening={voice.stop} />
