@@ -33,8 +33,11 @@ function makeDevServerV5Compatible(devServerConfig) {
         : "http";
   compatibleConfig.headers = {
     ...compatibleConfig.headers,
-    "Cross-Origin-Resource-Policy": "same-origin",
+    // Bolt's preview loads the app from another origin inside an iframe.
+    "Cross-Origin-Resource-Policy": "cross-origin",
   };
+  compatibleConfig.allowedHosts = "all";
+  compatibleConfig.client = { ...(compatibleConfig.client || {}), overlay: false };
 
   if (onBeforeSetupMiddleware || setupMiddlewares) {
     compatibleConfig.setupMiddlewares = (middlewares, devServer) => {
@@ -163,7 +166,7 @@ webpackConfig.devServer = (devServerConfig) => {
 };
 
 // Wrap with visual edits (automatically adds babel plugin, dev server, and overlay in dev mode)
-if (isDevServer) {
+if (isDevServer && process.env.DISABLE_EMERGENT_OVERLAY !== "true") {
   try {
     const { withVisualEdits } = require("@emergentbase/visual-edits/craco");
     webpackConfig = withVisualEdits(webpackConfig);

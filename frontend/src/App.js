@@ -9,6 +9,9 @@ import LearningDashboard from "./pages/LearningDashboard";
 import WorldPage from "./pages/WorldPage";
 import PlayRouter from "./pages/PlayRouter";
 import PracticePage from "./pages/PracticePage";
+import TypingHub from "./pages/TypingHub";
+import TypingPractice from "./pages/TypingPractice";
+import WordRain from "./pages/WordRain";
 import AchievementScreen from "./pages/AchievementScreen";
 import ParentDashboard from "./pages/ParentDashboard";
 import ProgressPage from "./pages/ProgressPage";
@@ -28,6 +31,10 @@ function AnimatedRoutes() {
           <Route path="/world/:worldId" element={<WorldPage />} />
           <Route path="/play/:activityId" element={<PlayRouter />} />
           <Route path="/practice/:unitId" element={<PracticePage />} />
+          <Route path="/typing" element={<TypingHub />} />
+          <Route path="/typing/lesson/:lessonId" element={<TypingPractice mode="lesson" />} />
+          <Route path="/typing/test" element={<TypingPractice mode="test" />} />
+          <Route path="/typing/rain" element={<WordRain />} />
           <Route path="/done/:gameId" element={<AchievementScreen />} />
           <Route path="/progress" element={<ProgressPage />} />
           <Route path="/certificate/:badgeId" element={<CertificatePage />} />

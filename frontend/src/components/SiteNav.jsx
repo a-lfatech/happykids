@@ -8,6 +8,7 @@ import { ToyButton } from "./ToyButton";
 const LINKS = [
   { to: "/", label: "Home", id: "home" },
   { to: "/#worlds", label: "Our Learning Worlds", id: "worlds" },
+  { to: "/typing", label: "Typing", id: "typing" },
   { to: "/progress", label: "My Progress", id: "progress" },
   { to: "/about", label: "About Us", id: "about" },
   { to: "/parents", label: "Parents", id: "parents" },

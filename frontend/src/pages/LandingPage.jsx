@@ -1,18 +1,21 @@
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Brain, BookOpen, Code, Coins, Gamepad2, Globe, Heart, Lightbulb, Loader2, Map as MapIcon, Music, RefreshCw, ShieldCheck, Sparkles, Star } from "lucide-react";
+import { ArrowRight, Brain, BookOpen, Code, Coins, Gamepad2, Globe, Heart, Keyboard, Lightbulb, Loader2, Map as MapIcon, Music, RefreshCw, ShieldCheck, Sparkles, Star } from "lucide-react";
 import { PageShell } from "../components/SiteNav";
 import { ToyButton } from "../components/ToyButton";
 import { WorldCard } from "../components/WorldCard";
 import { Character, CHARACTERS } from "../components/Characters";
 import Onboarding from "../components/Onboarding";
 import GradeMap from "../components/GradeMap";
+import { Poster } from "../components/Poster";
 import { WORLDS, FUTURE_WORLDS } from "../data/worlds";
 import { speak, unlockAudio } from "../lib/audioManager";
 import { clearLearner, fetchGradeMap, getLearner, nextOpenUnit } from "../lib/mastery";
 
 const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+
+const TYPING_WORLD = { id: "typing", num: "07", title: "Key Quest", subject: "Typing", blurb: "Learn the keyboard with lessons, a speed test and the Word Rain game!", icon: "/hk/icon_reading.png", card: "bg-hc-mintlight", strong: "bg-hc-mint" };
 
 const Clouds = () => [{ top: "12%", s: "w-40", delay: "0s" }, { top: "38%", s: "w-28", delay: "-25s" }, { top: "6%", s: "w-32", delay: "-45s" }].map((c, i) => (
   <div key={i} className={`hk-cloud pointer-events-none absolute left-0 h-12 ${c.s} rounded-full bg-white/90`} style={{ top: c.top, animationDelay: c.delay }} aria-hidden="true">
@@ -32,7 +35,7 @@ const Welcome = ({ learner, next, onPlay }) => {
           {hello}
         </button>
       </div>
-      <div className="grid w-full gap-3 sm:grid-cols-3">
+      <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
         <ToyButton color="coral" className="min-h-[88px] flex-col !gap-0 text-2xl" onClick={() => next && onPlay(next)} disabled={!next} data-testid="hero-continue">
           <span className="text-3xl" aria-hidden="true">{next ? next.emoji : "⭐"}</span>
           <span>{next ? "PLAY" : "ALL DONE!"}</span>
@@ -40,6 +43,7 @@ const Welcome = ({ learner, next, onPlay }) => {
         </ToyButton>
         <ToyButton color="sun" className="min-h-[88px] text-2xl" onClick={() => scrollTo("map")} data-testid="hero-map"><MapIcon className="h-8 w-8" strokeWidth={2.5} /> MY MAP</ToyButton>
         <ToyButton color="sky" className="min-h-[88px] text-2xl" onClick={() => navigate("/learn")} data-testid="hero-games"><Gamepad2 className="h-8 w-8" strokeWidth={2.5} /> GAMES</ToyButton>
+        <ToyButton color="mint" className="min-h-[88px] text-2xl" onClick={() => navigate("/typing")} data-testid="hero-typing"><Keyboard className="h-8 w-8" strokeWidth={2.5} /> TYPING</ToyButton>
       </div>
     </div>
   );
@@ -165,6 +169,7 @@ export default function LandingPage() {
         <div className="relative mx-auto max-w-6xl">
           <img src="/hk/logo.png" alt="HappyKids" className="mx-auto mb-4 w-44 sm:w-60" data-testid="hero-logo" />
           {learner ? <Welcome learner={learner} next={nextOpenUnit(map)} onPlay={play} /> : <Onboarding onDone={setLearner} />}
+          <Poster name={learner?.name} />
         </div>
         <svg viewBox="0 0 1440 120" preserveAspectRatio="none" className="absolute inset-x-0 bottom-0 h-12 w-full" aria-hidden="true">
           <path d="M0 70 Q240 10 520 60 T1040 50 T1440 60 V120 H0 Z" fill="#9BE28F" />
@@ -180,6 +185,7 @@ export default function LandingPage() {
           <p className="mt-2 text-center text-lg font-bold">Pick a world and jump right in. Free play, no locks.</p>
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {WORLDS.map((w, i) => <WorldCard key={w.id} w={w} i={i} onClick={() => navigate(`/world/${w.id}`)} />)}
+            <WorldCard w={TYPING_WORLD} i={WORLDS.length} onClick={() => navigate("/typing")} />
           </div>
         </section>
 

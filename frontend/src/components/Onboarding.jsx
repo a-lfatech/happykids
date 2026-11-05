@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Delete, Keyboard, Loader2 } from "lucide-react";
+import { ArrowRight, Delete, Keyboard, Loader2, Mic } from "lucide-react";
 import { Character } from "./Characters";
 import { ToyButton } from "./ToyButton";
 import { speak, unlockAudio } from "../lib/audioManager";
 import { START_LEVELS, createLearner, saveLearner } from "../lib/mastery";
+import { extractGrade, extractName, listenForText, recognitionSupported, stopListening } from "../lib/speechRecognitionManager";
 import { useAppState } from "../context/AppState";
 
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const TILE_COLORS = ["bg-hc-sunlight", "bg-hc-skylight", "bg-hc-mintlight", "bg-hc-tanglight", "bg-hc-corallight"];
+const gradeFor = (g) => (g === 0 ? "K" : g >= 6 ? "G6" : "G1");
 const tidy = (n) => n.trim().replace(/\s+/g, " ").toLowerCase().replace(/(^|\s|-)\p{L}/gu, (m) => m.toUpperCase());
 
 export default function Onboarding({ onDone }) {
@@ -18,11 +20,45 @@ export default function Onboarding({ onDone }) {
   const [typing, setTyping] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [listening, setListening] = useState(false);
+  const [micNote, setMicNote] = useState("");
+  const canListen = recognitionSupported();
 
   const greet = () => {
     unlockAudio();
     setStep("name");
-    speak("Hi, welcome! I am Hoppy the bunny. What's your name? Tap the letters to spell it.");
+    speak(canListen ? "Hi, welcome! I am Hoppy the bunny. What's your name? Tap the microphone and say it, or tap the letters to spell it." : "Hi, welcome! I am Hoppy the bunny. What's your name? Tap the letters to spell it.");
+  };
+
+  const hear = (onText) => {
+    unlockAudio();
+    setMicNote("");
+    setListening(true);
+    listenForText({
+      onText,
+      onDenied: () => setMicNote("The microphone is switched off. Ask a grown-up, or spell it with the letters."),
+      onEnd: () => setListening(false),
+    });
+  };
+
+  const sayName = () => {
+    if (listening) { stopListening(); return; }
+    hear((text) => {
+      const n = tidy(extractName(text));
+      if (!n) { setMicNote("I didn't catch that. Try again!"); return; }
+      setName(n);
+      speak(`Is your name ${n}? Tap That's me! Or fix the letters.`);
+    });
+  };
+
+  const sayGrade = () => {
+    if (listening) { stopListening(); return; }
+    hear((text) => {
+      const g = extractGrade(text);
+      if (g === null) { setMicNote("I didn't hear a grade. Try saying: grade six, or kindergarten."); speak("Try saying grade six, or kindergarten."); return; }
+      const note = g >= 2 && g <= 5 ? `Grade ${g} is still being built, so we'll start with Grade 1 and climb up. ` : g >= 7 ? `Grade ${g} is still being built, so we'll start with Grade 6. ` : "";
+      pick(gradeFor(g), note);
+    });
   };
 
   const tap = (l) => {
@@ -39,7 +75,7 @@ export default function Onboarding({ onDone }) {
     speak(`Nice to meet you, ${n}! Where shall we start?`);
   };
 
-  const pick = async (grade) => {
+  const pick = async (grade, note = "") => {
     setBusy(true);
     setError("");
     try {
@@ -48,7 +84,7 @@ export default function Onboarding({ onDone }) {
       const learner = { token: res.token, name, startGrade: res.start_grade || grade };
       saveLearner(learner);
       updateProfile(profile.id, { name, ...(grade === "G6" ? {} : { level: grade }) });
-      speak(`Hooray, ${name}! Let's go on an adventure!`);
+      speak(`${note}Hooray, ${name}! Everything in ${START_LEVELS.find((l) => l.id === grade)?.label || "your level"} is open for you. Let's go!`);
       onDone(learner);
     } catch {
       setError("Hmm, I couldn't reach the learning map. Please check the internet and try again.");
@@ -84,6 +120,12 @@ export default function Onboarding({ onDone }) {
             <div className="flex min-h-[64px] w-full max-w-lg items-center justify-center gap-2 rounded-[1.5rem] border-[3px] border-dashed border-hc-navy bg-white/80 px-4 py-2 font-fredoka text-4xl font-bold tracking-wider" data-testid="onboarding-name">
               {name || <span className="text-xl font-semibold opacity-50">Your name goes here</span>}
             </div>
+            {canListen && (
+              <ToyButton color={listening ? "coral" : "sun"} className={`min-h-[64px] px-8 text-xl ${listening ? "hc-pulse" : ""}`} onClick={sayName} data-testid="onboarding-say-name">
+                <Mic className="h-7 w-7" strokeWidth={2.5} /> {listening ? "I'm listening..." : "SAY MY NAME"}
+              </ToyButton>
+            )}
+            {micNote && <p className="font-bold" role="status">{micNote}</p>}
             {typing ? (
               <input autoFocus value={name} maxLength={16} onChange={(e) => setName(e.target.value.replace(/[^\p{L}\s'-]/gu, ""))} onKeyDown={(e) => e.key === "Enter" && confirmName()} className="toy-focus w-full max-w-lg rounded-2xl border-[3px] border-hc-navy px-4 py-3 text-center font-fredoka text-2xl" placeholder="Type your name" aria-label="Type your name" data-testid="onboarding-name-input" />
             ) : (
@@ -112,6 +154,12 @@ export default function Onboarding({ onDone }) {
                 </motion.button>
               ))}
             </div>
+            {canListen && (
+              <ToyButton color={listening ? "coral" : "sun"} className={`min-h-[60px] px-6 ${listening ? "hc-pulse" : ""}`} onClick={sayGrade} disabled={busy} data-testid="onboarding-say-grade">
+                <Mic className="h-6 w-6" strokeWidth={2.5} /> {listening ? "I'm listening..." : "Or SAY your grade"}
+              </ToyButton>
+            )}
+            {micNote && <p className="font-bold" role="status">{micNote}</p>}
             {busy && <p className="flex items-center gap-2 font-bold"><Loader2 className="h-5 w-5 animate-spin" /> Getting your map ready...</p>}
             {error && <p className="rounded-2xl border-[3px] border-hc-navy bg-hc-corallight px-4 py-2 font-bold" role="alert">{error}</p>}
             <button type="button" className="toy-focus rounded-full px-3 py-1 font-bold underline" onClick={() => setStep("name")}>Change my name</button>
