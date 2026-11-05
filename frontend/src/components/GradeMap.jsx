@@ -59,6 +59,9 @@ export default function GradeMap({ map, onPlay }) {
             <div className="flex flex-wrap items-center justify-center gap-3">
               <h3 className={`rounded-full border-[3px] border-hc-navy px-5 py-1.5 font-fredoka text-2xl font-bold ${GRADE_COLORS[g.id] || "bg-white"}`} style={{ boxShadow: "0 4px 0 #1F2547" }}>{g.title}</h3>
               <span className="rounded-full border-2 border-hc-navy bg-white px-3 py-1 text-sm font-bold">{done} of {g.units.length} mastered</span>
+              {g.units.some((u) => u.content_status === "sample") && (
+                <span className="rounded-full border-2 border-dashed border-hc-navy/60 bg-hc-sunlight px-3 py-1 text-xs font-bold" title="These practice questions are early sample content and have not yet been checked against a school curriculum." data-testid={`grade-${g.id}-sample`}>Sample questions</span>
+              )}
             </div>
             <ol className="relative mt-6 grid grid-cols-2 gap-x-4 gap-y-6 pb-10 sm:grid-cols-3 lg:grid-cols-6">
               <span className="pointer-events-none absolute left-[8%] right-[8%] top-10 hidden border-t-[4px] border-dashed border-hc-navy/25 lg:block" aria-hidden="true" />

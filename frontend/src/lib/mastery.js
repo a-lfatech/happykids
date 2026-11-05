@@ -47,6 +47,7 @@ export const setStartGrade = (token, grade) => rpc("hk_set_start_grade", { p_tok
 export const fetchGradeMap = (token) => rpc("hk_grade_map", { p_token: token });
 export const nextQuestion = (token, unit) => rpc("hk_next_question", { p_token: token, p_unit: unit });
 export const submitAnswer = (token, attempt, choice) => rpc("hk_answer", { p_token: token, p_attempt: attempt, p_choice: choice });
+export const getHelp = (token, attempt) => rpc("hk_get_help", { p_token: token, p_attempt: attempt });
 
 export const nextOpenUnit = (map) => {
   if (!map?.grades) return null;
