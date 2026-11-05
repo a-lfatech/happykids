@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+@supports not (height: 100dvh) {
+  .h-\[100dvh\] { height: 100vh; }
+  .min-h-\[100dvh\] { min-height: 100vh; }
+}
+
 @layer base {
   :root {
     --background: 40 100% 95%;

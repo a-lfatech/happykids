@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Loader2, Map as MapIcon, RefreshCw, Volume2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, Map as MapIcon, RefreshCw, Volume2, X } from "lucide-react";
 import { Character } from "../components/Characters";
 import { ToyButton } from "../components/ToyButton";
 import { Confetti } from "../components/Confetti";
@@ -169,9 +169,11 @@ export default function PracticePage() {
 
       <AnimatePresence>
         {won && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 grid place-items-center bg-hc-navy/60 p-4" role="dialog" aria-modal="true" data-testid="mastered-dialog">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 overflow-y-auto bg-hc-navy/60 p-4" role="dialog" aria-modal="true" data-testid="mastered-dialog">
             <Confetti />
+            <div className="flex min-h-full items-center justify-center">
             <motion.div initial={{ scale: 0.7, y: 30 }} animate={{ scale: 1, y: 0 }} transition={{ type: "spring", stiffness: 220, damping: 16 }} className="toy-card relative w-full max-w-md p-6 text-center">
+              <button type="button" onClick={() => navigate("/")} className="toy-focus absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-full border-[3px] border-hc-navy bg-white transition-transform hover:scale-110" style={{ boxShadow: "0 3px 0 #1F2547" }} aria-label="Close and go home" data-testid="mastered-close"><X className="h-5 w-5" strokeWidth={3} /></button>
               <Character name="hoppy" mood="celebrate" className="mx-auto w-28" />
               <h2 className="mt-2 font-fredoka text-3xl font-bold">You did it, {learner.name}!</h2>
               <p className="mt-1 font-bold">You mastered {q?.unit_title}.</p>
@@ -182,6 +184,7 @@ export default function PracticePage() {
                 <button type="button" className="toy-focus font-bold underline" onClick={() => { setWon(null); load(); }}>Keep practising this one</button>
               </div>
             </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

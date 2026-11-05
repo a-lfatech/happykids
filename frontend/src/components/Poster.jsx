@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { MessageCircle, Minus, Shuffle } from "lucide-react";
@@ -83,11 +83,30 @@ const DiscoverMenu = ({ open, onClose, next, onLesson }) => {
   );
 };
 
+const usePosterBox = () => {
+  const ref = useRef(null);
+  const read = () => ({ vw: window.innerWidth, vh: window.innerHeight, w: ref.current?.clientWidth || window.innerWidth, h: ref.current?.clientHeight || window.innerHeight });
+  const [box, setBox] = useState(read);
+  useLayoutEffect(() => {
+    const update = () => setBox(read());
+    update();
+    window.addEventListener("resize", update);
+    const ro = typeof ResizeObserver !== "undefined" && ref.current ? new ResizeObserver(update) : null;
+    if (ro) ro.observe(ref.current);
+    return () => { window.removeEventListener("resize", update); ro?.disconnect(); };
+  }, []);
+  return [ref, box];
+};
+
 export const Poster = ({ name, children, hoppyLine, onPlay, onLearn, next, onLesson }) => {
   const [active, setActive] = useState(null);
   const [discover, setDiscover] = useState(false);
   const [tucked, setTucked] = useState(true);
-  const frame = { width: `max(100cqw, ${POSTER_RATIO * 100}cqh)`, aspectRatio: `${POSTER_RATIO}` };
+  const [heroRef, box] = usePosterBox();
+  const frameW = Math.max(box.w, box.h * POSTER_RATIO);
+  const frameH = frameW / POSTER_RATIO;
+  const frame = { width: frameW, height: frameH };
+  const chipTop = Math.max(frameH * 0.25, frameH - box.h + 96);
 
   const openBubble = () => {
     unlockAudio();
@@ -104,8 +123,8 @@ export const Poster = ({ name, children, hoppyLine, onPlay, onLearn, next, onLes
   };
 
   return (
-    <section className="relative -mx-4 flex flex-col overflow-hidden sm:-mx-8" style={{ minHeight: `max(100dvh, ${100 / POSTER_RATIO}vw)` }} data-testid="landing-hero">
-      <div className="absolute inset-0" style={{ containerType: "size" }}>
+    <section ref={heroRef} className="relative -mx-4 flex flex-col overflow-hidden sm:-mx-8" style={{ minHeight: Math.max(box.vh, box.vw / POSTER_RATIO) }} data-testid="landing-hero">
+      <div className="absolute inset-0">
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2" style={frame}>
           <img src="/hk/playground_hero.jpg" alt="Ellie, Hoppy, Finn, Froggy and Sunny playing in a sunny park with floating letters and numbers" className="absolute inset-0 h-full w-full select-none" draggable="false" />
           {FRIENDS.map((f) => (
@@ -138,11 +157,11 @@ export const Poster = ({ name, children, hoppyLine, onPlay, onLearn, next, onLes
         {tucked && <Sticker label="Discover!" color="bg-hc-sun" rotate={0} delay={0.8} onClick={() => { speak("Let's discover something exciting!"); setDiscover(true); }} className="inset-x-0 bottom-12 flex justify-center sm:bottom-16" testId="sticker-discover" />}
       </div>
 
-      <div className="pointer-events-none absolute inset-0" style={{ containerType: "size" }}>
+      <div className="pointer-events-none absolute inset-0">
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2" style={frame}>
           <AnimatePresence>
             {tucked ? (
-              <div key="chip" className="absolute left-1/2 -translate-x-1/2" style={{ top: "max(25%, calc(100% - 100cqh + 96px))" }}>
+              <div key="chip" className="absolute left-1/2 -translate-x-1/2" style={{ top: chipTop }}>
                 <motion.button
                   type="button"
                   initial={{ scale: 0.5, opacity: 0, y: 10 }}
