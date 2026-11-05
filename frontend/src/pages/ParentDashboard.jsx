@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { BookOpen, Clock, Cloud, CloudOff, LogIn, LogOut, Plus, Target, ThumbsUp, Trash2, Trophy, UserRound } from "lucide-react";
+import { BookOpen, Clock, Cloud, CloudOff, LogIn, LogOut, Plus, Target, ThumbsUp, Trash2, Trophy, UserPlus, UserRound } from "lucide-react";
+import { supabase } from "../lib/supabase";
 import { useAppState } from "../context/AppState";
 import { PageShell } from "../components/SiteNav";
 import { PressHold } from "../components/PressHold";
@@ -35,10 +36,44 @@ const Gate = ({ onOpen }) => (
   </div>
 );
 
-// REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
-const signIn = () => {
-  sessionStorage.setItem("hc_grownup_return", "1");
-  window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(window.location.origin + "/parents")}`;
+const AUTH_ERRORS = [
+  [/invalid login credentials/i, "That email and password don't match. Please try again."],
+  [/already registered|already exists/i, "An account with this email already exists. Try signing in instead."],
+  [/password/i, "Please use a password with at least 6 characters."],
+  [/email/i, "Please check the email address."],
+];
+const friendlyAuthError = (msg = "") => AUTH_ERRORS.find(([re]) => re.test(msg))?.[1] || "Something went wrong. Please check your connection and try again.";
+
+const SignInForm = () => {
+  const [mode, setMode] = useState("signin");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const submit = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    const creds = { email: email.trim(), password };
+    const { error: err } = mode === "signin" ? await supabase.auth.signInWithPassword(creds) : await supabase.auth.signUp(creds);
+    setBusy(false);
+    if (err) setError(friendlyAuthError(err.message));
+  };
+  const input = "w-full rounded-2xl border-[3px] border-hc-navy bg-hc-cream px-4 py-3 font-bold outline-none transition-colors focus:bg-white";
+  return (
+    <form onSubmit={submit} className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]" data-testid="parent-auth-form">
+      <input required type="email" autoComplete="email" placeholder="Parent email" value={email} onChange={(e) => setEmail(e.target.value)} className={input} data-testid="auth-email" />
+      <input required type="password" minLength={6} autoComplete={mode === "signin" ? "current-password" : "new-password"} placeholder="Password (6+ characters)" value={password} onChange={(e) => setPassword(e.target.value)} className={input} data-testid="auth-password" />
+      <ToyButton type="submit" color="sky" disabled={busy} data-testid="auth-submit">
+        {mode === "signin" ? <LogIn className="h-5 w-5" /> : <UserPlus className="h-5 w-5" />}
+        {busy ? "Please wait..." : mode === "signin" ? "Sign in" : "Create account"}
+      </ToyButton>
+      {error && <p className="rounded-2xl bg-hc-corallight p-3 font-bold sm:col-span-3" role="alert" data-testid="auth-error">{error}</p>}
+      <button type="button" onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(""); }} className="toy-focus justify-self-start rounded-lg text-sm font-bold underline underline-offset-4 hover:opacity-70 sm:col-span-3" data-testid="auth-toggle">
+        {mode === "signin" ? "New here? Create a parent account" : "Already have an account? Sign in"}
+      </button>
+    </form>
+  );
 };
 
 const AccountCard = () => {
@@ -49,16 +84,16 @@ const AccountCard = () => {
       {user ? (
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="font-bold" data-testid="account-email">Signed in as {user.name} ({user.email})</p>
+            <p className="font-bold" data-testid="account-email">Signed in as {user.email}</p>
             <p className="text-sm font-bold opacity-75" data-testid="cloud-status">Progress backup: {cloud === "saved" ? "saved to your account" : cloud === "syncing" ? "saving..." : cloud === "error" ? "could not save, will retry" : "ready"}</p>
           </div>
           <ToyButton color="white" onClick={logout} data-testid="logout-button"><LogOut className="h-5 w-5" /> Sign out</ToyButton>
         </div>
       ) : (
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-          <p className="max-w-md font-bold">Progress is saved on this device. Sign in to back it up and use it on other devices. Children never need an account.</p>
-          <ToyButton color="sky" onClick={signIn} data-testid="google-signin-button"><LogIn className="h-5 w-5" /> Sign in with Google</ToyButton>
-        </div>
+        <>
+          <p className="mt-3 max-w-xl font-bold">Progress is saved on this device. Sign in to back it up privately and use it on other devices. Children never need an account.</p>
+          <SignInForm />
+        </>
       )}
     </section>
   );
@@ -106,11 +141,7 @@ const skillFor = (id, idx) => (id === "missing-numbers" || id === "more-or-less"
 
 export default function ParentDashboard() {
   const { profile, pdata, resetProgress } = useAppState();
-  const [open, setOpen] = useState(() => {
-    const back = sessionStorage.getItem("hc_grownup_return") === "1";
-    sessionStorage.removeItem("hc_grownup_return");
-    return back;
-  });
+  const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const unlock = () => setOpen(true);
 

@@ -1,0 +1,10 @@
+{
+  "name": "happykids",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "postinstall": "cd frontend && npm install --legacy-peer-deps --no-audit --no-fund",
+    "dev": "cd frontend && BROWSER=none DISABLE_ESLINT_PLUGIN=true DISABLE_EMERGENT_OVERLAY=true npx craco start",
+    "build": "cd frontend && DISABLE_ESLINT_PLUGIN=true CI=false npx craco build && rm -rf ../dist && cp -r build ../dist"
+  }
+}

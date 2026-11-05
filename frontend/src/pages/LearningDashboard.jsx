@@ -8,7 +8,7 @@ import { CHARACTERS, Character } from "../components/Characters";
 import { ListenButton } from "../components/SpeechPanel";
 import { ToyButton } from "../components/ToyButton";
 import { Modal } from "../components/Modal";
-import { WorldCard } from "./LandingPage";
+import { WorldCard } from "../components/WorldCard";
 import { ACTIVITIES, WORLDS, activityById, dailyAdventure, solvedCount, worldById } from "../data/worlds";
 import { speak } from "../lib/audioManager";
 

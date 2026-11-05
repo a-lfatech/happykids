@@ -1,8 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { configure, onSpeechFail, setMusic, unlockAudio } from "../lib/audioManager";
+import { supabase } from "../lib/supabase";
 
 const KEY = "hopcount_progress_v1";
-export const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const blankData = () => ({ games: {}, totalStars: 0, recent: [] });
 const defaultSettings = { sound: true, speech: true, mic: false, music: false, volume: 0.8, reducedMotion: false };
 const fresh = () => ({ settings: defaultSettings, profiles: [{ id: "p1", name: "Little Explorer", avatar: "hoppy", level: "K" }], activeId: "p1", data: { p1: blankData() }, updatedAt: 0 });
@@ -38,29 +38,35 @@ export function AppStateProvider({ children }) {
     const u = () => unlockAudio();
     window.addEventListener("pointerdown", u, { once: true });
     window.addEventListener("keydown", u, { once: true });
-    if (!window.location.hash.includes("session_id=")) {
-      fetch(`${API}/auth/me`, { credentials: "include" }).then((r) => (r.ok ? r.json() : null)).then(setUser).catch(() => setUser(null));
-    }
-    return () => { window.removeEventListener("pointerdown", u); window.removeEventListener("keydown", u); };
+    const toUser = (session) => (session?.user ? { id: session.user.id, email: session.user.email } : null);
+    supabase.auth.getSession().then(({ data }) => setUser(toUser(data.session)));
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      const next = toUser(session);
+      setUser((prev) => (prev?.id === next?.id ? prev : next));
+    });
+    return () => { window.removeEventListener("pointerdown", u); window.removeEventListener("keydown", u); sub.subscription.unsubscribe(); };
   }, []);
 
   // Cloud sync: newest copy wins on sign-in, then save changes automatically.
   useEffect(() => {
     if (!user) { syncReady.current = false; return; }
     setCloud("syncing");
-    fetch(`${API}/progress`, { credentials: "include" }).then((r) => r.json()).then((doc) => {
-      setState((local) => (doc.state && doc.updated_at > local.updatedAt ? migrate(doc.state) : local));
+    supabase.from("family_progress").select("state, updated_at").maybeSingle().then(({ data, error }) => {
+      if (error) { setCloud("error"); return; }
+      if (data?.state?.profiles?.length && data.updated_at > 0) {
+        setState((local) => (data.updated_at > local.updatedAt ? migrate(data.state) : local));
+      }
       syncReady.current = true;
       setCloud("saved");
-    }).catch(() => setCloud("error"));
+    });
   }, [user]);
 
   useEffect(() => {
     if (!user || !syncReady.current) return;
     const t = setTimeout(() => {
       setCloud("syncing");
-      fetch(`${API}/progress`, { method: "PUT", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ state, updated_at: state.updatedAt }) })
-        .then((r) => setCloud(r.ok ? "saved" : "error")).catch(() => setCloud("error"));
+      supabase.from("family_progress").upsert({ user_id: user.id, state, updated_at: state.updatedAt })
+        .then(({ error }) => setCloud(error ? "error" : "saved"));
     }, 1200);
     return () => clearTimeout(t);
   }, [state, user]);
@@ -97,7 +103,7 @@ export function AppStateProvider({ children }) {
   const setActive = useCallback((id) => setState((s) => ({ ...s, activeId: id })), []);
 
   const logout = useCallback(async () => {
-    await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" }).catch(() => {});
+    await supabase.auth.signOut();
     setUser(null);
     setCloud("idle");
   }, []);
@@ -106,7 +112,7 @@ export function AppStateProvider({ children }) {
   const pdata = state.data[profile.id] || blankData();
 
   return (
-    <Ctx.Provider value={{ state, profile, pdata, updateSettings, recordAttempt, recordComplete, recordGameComplete, resetProgress, addProfile, updateProfile, removeProfile, setActive, audioHelp, setAudioHelp, user, setUser, logout, cloud }}>
+    <Ctx.Provider value={{ state, profile, pdata, updateSettings, recordAttempt, recordComplete, recordGameComplete, resetProgress, addProfile, updateProfile, removeProfile, setActive, audioHelp, setAudioHelp, user, logout, cloud }}>
       {children}
     </Ctx.Provider>
   );

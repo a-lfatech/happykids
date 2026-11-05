@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { BookOpen, Heart, Mail, ShieldCheck, Sparkles } from "lucide-react";
 import { PageShell } from "../components/SiteNav";
 import { ToyButton } from "../components/ToyButton";
-import { API } from "../context/AppState";
+import { supabase } from "../lib/supabase";
 
 const ContactForm = () => {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -11,9 +11,9 @@ const ContactForm = () => {
   const submit = async (e) => {
     e.preventDefault();
     setStatus("sending");
-    const r = await fetch(`${API}/contact`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) }).catch(() => null);
-    setStatus(r?.ok ? "sent" : "error");
-    if (r?.ok) setForm({ name: "", email: "", message: "" });
+    const { error } = await supabase.from("contact_messages").insert({ name: form.name.trim(), email: form.email.trim(), message: form.message.trim() });
+    setStatus(error ? "error" : "sent");
+    if (!error) setForm({ name: "", email: "", message: "" });
   };
   const input = "w-full rounded-2xl border-[3px] border-hc-navy bg-hc-cream px-4 py-3 font-bold outline-none focus:bg-white";
   return (

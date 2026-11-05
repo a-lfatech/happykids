@@ -31,23 +31,23 @@ export const SpeechPanel = ({ character, mood, title, text, tone = "neutral", on
   const toneBg = { neutral: "bg-white", correct: "bg-hc-mintlight", wrong: "bg-hc-corallight" }[tone];
   return (
     <div className="flex items-end gap-3 sm:gap-4" data-testid="speech-panel">
-      <Character name={character} mood={mood} className="w-20 shrink-0 sm:w-28 lg:w-36" testId={`${character}-character`} />
+      <Character name={character} mood={mood} className="w-16 shrink-0 sm:w-24 lg:w-32 [@media(max-height:720px)]:w-14" testId={`${character}-character`} />
       <div className="min-w-0 flex-1">
         <motion.div
           key={`${title}-${text}`}
           initial={{ scale: 0.95, opacity: 0.4 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 320, damping: 20 }}
-          className={`relative rounded-[1.75rem] border-[3px] border-hc-navy p-4 sm:p-5 ${toneBg}`}
+          className={`relative rounded-[1.75rem] border-[3px] border-hc-navy p-3 sm:p-4 ${toneBg}`}
           style={{ boxShadow: "0 5px 0 #1F2547" }}
           data-testid="speech-bubble"
           aria-live="polite"
         >
           <span className="speech-tail -left-[13px] bottom-6" style={{ background: "inherit" }} />
-          <p className="font-fredoka text-xl font-semibold leading-tight sm:text-3xl" data-testid="speech-title">{title}</p>
+          <p className="font-fredoka text-xl font-semibold leading-tight sm:text-2xl lg:text-3xl" data-testid="speech-title">{title}</p>
           {text && <p className="mt-1.5 text-base font-bold leading-snug sm:text-lg" data-testid="speech-text">{text}</p>}
         </motion.div>
-        <div className="mt-4 flex flex-wrap items-center gap-3">
+        <div className="mt-2 flex flex-wrap items-center gap-3 sm:mt-3">
           <ListenButton onClick={onListen} />
           {listening && <ListeningBadge onStop={onStopListening} />}
         </div>
