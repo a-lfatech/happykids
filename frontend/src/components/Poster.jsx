@@ -104,7 +104,7 @@ export const Poster = ({ name, children, hoppyLine, onPlay, onLearn, next, onLes
   };
 
   return (
-    <section className="relative -mx-4 flex min-h-[100dvh] flex-col overflow-hidden sm:-mx-8" data-testid="landing-hero">
+    <section className="relative -mx-4 flex flex-col overflow-hidden sm:-mx-8" style={{ minHeight: `max(100dvh, ${100 / POSTER_RATIO}vw)` }} data-testid="landing-hero">
       <div className="absolute inset-0" style={{ containerType: "size" }}>
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2" style={frame}>
           <img src="/hk/playground_hero.jpg" alt="Ellie, Hoppy, Finn, Froggy and Sunny playing in a sunny park with floating letters and numbers" className="absolute inset-0 h-full w-full select-none" draggable="false" />
@@ -142,7 +142,7 @@ export const Poster = ({ name, children, hoppyLine, onPlay, onLearn, next, onLes
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2" style={frame}>
           <AnimatePresence>
             {tucked ? (
-              <div key="chip" className="absolute left-1/2 top-[25%] -translate-x-1/2">
+              <div key="chip" className="absolute left-1/2 -translate-x-1/2" style={{ top: "max(25%, calc(100% - 100cqh + 96px))" }}>
                 <motion.button
                   type="button"
                   initial={{ scale: 0.5, opacity: 0, y: 10 }}
