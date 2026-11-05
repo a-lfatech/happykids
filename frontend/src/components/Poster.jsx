@@ -86,10 +86,18 @@ const DiscoverMenu = ({ open, onClose, next, onLesson }) => {
 export const Poster = ({ name, children, hoppyLine, onPlay, onLearn, next, onLesson }) => {
   const [active, setActive] = useState(null);
   const [discover, setDiscover] = useState(false);
-  const [tucked, setTucked] = useState(false);
+  const [tucked, setTucked] = useState(true);
+  const frame = { width: `max(100cqw, ${POSTER_RATIO * 100}cqh)`, aspectRatio: `${POSTER_RATIO}` };
+
+  const openBubble = () => {
+    unlockAudio();
+    sfx.tap();
+    setTucked(false);
+  };
 
   const hello = (f) => {
     unlockAudio();
+    if (f.id === "hoppy") setTucked(false);
     setActive(f.id);
     speak(f.id === "hoppy" ? hoppyLine : `Hi${name ? ` ${name}` : ""}! ${f.line}`);
     setTimeout(() => setActive((a) => (a === f.id ? null : a)), 2600);
@@ -98,7 +106,7 @@ export const Poster = ({ name, children, hoppyLine, onPlay, onLearn, next, onLes
   return (
     <section className="relative -mx-4 flex min-h-[100dvh] flex-col overflow-hidden sm:-mx-8" data-testid="landing-hero">
       <div className="absolute inset-0" style={{ containerType: "size" }}>
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2" style={{ width: `max(100cqw, ${POSTER_RATIO * 100}cqh)`, aspectRatio: `${POSTER_RATIO}` }}>
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2" style={frame}>
           <img src="/hk/playground_hero.jpg" alt="Ellie, Hoppy, Finn, Froggy and Sunny playing in a sunny park with floating letters and numbers" className="absolute inset-0 h-full w-full select-none" draggable="false" />
           {FRIENDS.map((f) => (
             <button
@@ -124,45 +132,53 @@ export const Poster = ({ name, children, hoppyLine, onPlay, onLearn, next, onLes
 
       <Waves />
 
-      <div className="pointer-events-none relative flex flex-1 flex-col px-3 pt-[88px] sm:px-8 sm:pt-[100px]">
-        <AnimatePresence mode="wait" initial={false}>
-          {tucked ? (
-            <motion.button
-              key="chip"
-              type="button"
-              initial={{ scale: 0.6, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.6, opacity: 0 }}
-              onClick={() => { sfx.tap(); setTucked(false); }}
-              className="toy-focus pointer-events-auto mx-auto flex items-center gap-2 rounded-full border-[3px] border-hc-navy bg-white/75 px-4 py-2 font-fredoka text-lg font-bold backdrop-blur-md"
-              style={{ boxShadow: "0 4px 0 #1F2547" }}
-              data-testid="hoppy-bubble-open"
-            >
-              <MessageCircle className="h-5 w-5" strokeWidth={2.5} /> Talk to Hoppy
-            </motion.button>
-          ) : (
-            <motion.div
-              key="bubble"
-              initial={{ scale: 0.9, opacity: 0, y: -10 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.85, opacity: 0, y: -10 }}
-              transition={{ type: "spring", stiffness: 180, damping: 20 }}
-              className="pointer-events-auto relative mx-auto w-full max-w-2xl rounded-[1.75rem] border-[3px] border-hc-navy bg-white/65 px-4 py-3 shadow-[0_5px_0_#1F2547] backdrop-blur-md sm:px-6 sm:py-4"
-              data-testid="hoppy-bubble"
-            >
-              <button type="button" onClick={() => setTucked(true)} className="toy-focus absolute right-2 top-2 rounded-full p-1 opacity-70 transition hover:bg-white hover:opacity-100" aria-label="Tuck the speech bubble away" data-testid="hoppy-bubble-tuck">
-                <Minus className="h-5 w-5" strokeWidth={3} />
-              </button>
-              {children}
-              <span className="absolute -bottom-[11px] left-1/2 h-5 w-5 -translate-x-1/2 rotate-45 border-b-[3px] border-r-[3px] border-hc-navy bg-white/80" aria-hidden="true" />
-            </motion.div>
-          )}
-        </AnimatePresence>
+      <div className="pointer-events-none relative flex-1">
+        <Sticker label="Play!" color="bg-hc-mint" rotate={-8} delay={0} onClick={onPlay} className="bottom-[22%] left-1 sm:left-6" testId="sticker-play" />
+        <Sticker label="Learn!" color="bg-hc-sky" rotate={8} delay={0.4} onClick={onLearn} className="bottom-[22%] right-1 sm:right-6" testId="sticker-learn" />
+        {tucked && <Sticker label="Discover!" color="bg-hc-sun" rotate={0} delay={0.8} onClick={() => { speak("Let's discover something exciting!"); setDiscover(true); }} className="inset-x-0 bottom-12 flex justify-center sm:bottom-16" testId="sticker-discover" />}
+      </div>
 
-        <div className="relative min-h-[36vh] flex-1 sm:min-h-[42vh]">
-          <Sticker label="Play!" color="bg-hc-mint" rotate={-8} delay={0} onClick={onPlay} className="bottom-[22%] left-1 sm:left-6" testId="sticker-play" />
-          <Sticker label="Learn!" color="bg-hc-sky" rotate={8} delay={0.4} onClick={onLearn} className="bottom-[22%] right-1 sm:right-6" testId="sticker-learn" />
-          <Sticker label="Discover!" color="bg-hc-sun" rotate={0} delay={0.8} onClick={() => { speak("Let's discover something exciting!"); setDiscover(true); }} className="inset-x-0 bottom-12 flex justify-center sm:bottom-16" testId="sticker-discover" />
+      <div className="pointer-events-none absolute inset-0" style={{ containerType: "size" }}>
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2" style={frame}>
+          <AnimatePresence>
+            {tucked ? (
+              <div key="chip" className="absolute left-1/2 top-[25%] -translate-x-1/2">
+                <motion.button
+                  type="button"
+                  initial={{ scale: 0.5, opacity: 0, y: 10 }}
+                  animate={{ scale: 1, opacity: 1, y: [0, -5, 0] }}
+                  exit={{ scale: 0.5, opacity: 0 }}
+                  transition={{ y: { repeat: Infinity, duration: 2.4, ease: "easeInOut" } }}
+                  onClick={openBubble}
+                  className="toy-focus pointer-events-auto relative flex w-max items-center gap-1.5 rounded-full border-[3px] border-hc-navy bg-white/80 px-3 py-1.5 font-fredoka text-base font-bold backdrop-blur-md sm:text-lg"
+                  style={{ boxShadow: "0 4px 0 #1F2547" }}
+                  aria-label="Open Hoppy's speech bubble"
+                  data-testid="hoppy-bubble-open"
+                >
+                  <MessageCircle className="h-5 w-5 text-hc-coral" strokeWidth={2.5} /> {name ? "Talk to Hoppy" : "Hi! Tap me"}
+                  <span className="absolute -bottom-[9px] left-1/2 h-4 w-4 -translate-x-1/2 rotate-45 border-b-[3px] border-r-[3px] border-hc-navy bg-white" aria-hidden="true" />
+                </motion.button>
+              </div>
+            ) : (
+              <div key="bubble" className="absolute left-[50.2%] top-[63%] w-[min(92vw,34rem)] -translate-x-1/2">
+                <motion.div
+                  initial={{ scale: 0.6, opacity: 0, y: -20 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0.6, opacity: 0, y: -20 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                  style={{ originY: 0 }}
+                  className="pointer-events-auto relative rounded-[1.75rem] border-[3px] border-hc-navy bg-white/75 px-4 pb-3 pt-4 shadow-[0_5px_0_#1F2547] backdrop-blur-md sm:px-6"
+                  data-testid="hoppy-bubble"
+                >
+                  <span className="absolute -top-[12px] left-1/2 h-5 w-5 -translate-x-1/2 rotate-45 border-l-[3px] border-t-[3px] border-hc-navy bg-white" aria-hidden="true" />
+                  <button type="button" onClick={() => setTucked(true)} className="toy-focus absolute right-2 top-2 rounded-full p-1 opacity-70 transition hover:bg-white hover:opacity-100" aria-label="Tuck the speech bubble away" data-testid="hoppy-bubble-tuck">
+                    <Minus className="h-5 w-5" strokeWidth={3} />
+                  </button>
+                  {children}
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
