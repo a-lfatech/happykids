@@ -21,19 +21,18 @@ const Welcome = ({ learner, next, onPlay }) => {
   const navigate = useNavigate();
   const hello = next ? `Hi ${learner.name}! Ready for ${next.title}?` : `Hi ${learner.name}! Ready to play?`;
   return (
-    <div className="mx-auto flex flex-col items-center gap-4 text-center" data-testid="welcome-back">
-      <button type="button" onClick={() => { unlockAudio(); speak(hello); }} className="toy-focus rounded-2xl font-fredoka text-2xl font-bold leading-tight sm:text-4xl" aria-label={`${hello} Tap to hear it.`}>
+    <div className="mx-auto flex flex-col items-center gap-2 text-center" data-testid="welcome-back">
+      <button type="button" onClick={() => { unlockAudio(); speak(hello); }} className="toy-focus rounded-2xl font-fredoka text-xl font-bold leading-tight sm:text-3xl" aria-label={`${hello} Tap to hear it.`}>
         {hello}
       </button>
-      <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
-        <ToyButton color="coral" className="min-h-[80px] flex-col !gap-0 text-2xl" onClick={() => next && onPlay(next)} disabled={!next} data-testid="hero-continue">
-          <span className="text-3xl" aria-hidden="true">{next ? next.emoji : "⭐"}</span>
+      <div className="flex flex-wrap justify-center gap-2">
+        <ToyButton color="coral" className="min-h-[48px] text-lg" title={next?.title} onClick={() => next && onPlay(next)} disabled={!next} data-testid="hero-continue">
+          <span aria-hidden="true">{next ? next.emoji : "⭐"}</span>
           <span>{next ? "PLAY" : "ALL DONE!"}</span>
-          {next && <span className="text-sm font-bold opacity-90">{next.title}</span>}
         </ToyButton>
-        <ToyButton color="sun" className="min-h-[80px] text-2xl" onClick={() => scrollTo("map")} data-testid="hero-map"><MapIcon className="h-8 w-8" strokeWidth={2.5} /> MY MAP</ToyButton>
-        <ToyButton color="sky" className="min-h-[80px] text-2xl" onClick={() => navigate("/learn")} data-testid="hero-games"><Gamepad2 className="h-8 w-8" strokeWidth={2.5} /> GAMES</ToyButton>
-        <ToyButton color="mint" className="min-h-[80px] text-2xl" onClick={() => navigate("/typing")} data-testid="hero-typing"><Keyboard className="h-8 w-8" strokeWidth={2.5} /> TYPING</ToyButton>
+        <ToyButton color="sun" className="min-h-[48px] text-lg" onClick={() => scrollTo("map")} data-testid="hero-map"><MapIcon className="h-5 w-5" strokeWidth={2.5} /> MY MAP</ToyButton>
+        <ToyButton color="sky" className="min-h-[48px] text-lg" onClick={() => navigate("/learn")} data-testid="hero-games"><Gamepad2 className="h-5 w-5" strokeWidth={2.5} /> GAMES</ToyButton>
+        <ToyButton color="mint" className="min-h-[48px] text-lg" onClick={() => navigate("/typing")} data-testid="hero-typing"><Keyboard className="h-5 w-5" strokeWidth={2.5} /> TYPING</ToyButton>
       </div>
     </div>
   );
@@ -158,7 +157,7 @@ export default function LandingPage() {
     : "Hi, welcome! I'm Hoppy the bunny. Tap Say hi, and tell me your name!";
 
   return (
-    <PageShell testId="landing-page">
+    <PageShell testId="landing-page" overlayNav>
       <Poster
         name={learner?.name}
         hoppyLine={hoppyLine}

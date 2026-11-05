@@ -83,10 +83,10 @@ export const SiteFooter = () => (
   </footer>
 );
 
-export const PageShell = ({ children, testId, bare }) => (
-  <div className="hc-bg min-h-screen" data-testid={testId}>
-    <SiteNav />
-    <main className="px-4 pt-8 sm:px-8">{children}</main>
+export const PageShell = ({ children, testId, bare, overlayNav }) => (
+  <div className="hc-bg relative min-h-screen" data-testid={testId}>
+    {overlayNav ? <div className="absolute inset-x-0 top-0 z-30"><SiteNav /></div> : <SiteNav />}
+    <main className={`px-4 sm:px-8 ${overlayNav ? "" : "pt-8"}`}>{children}</main>
     {!bare && <SiteFooter />}
   </div>
 );

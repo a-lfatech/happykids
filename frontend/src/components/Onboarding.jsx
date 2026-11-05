@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Delete, Keyboard, Loader2, Mic } from "lucide-react";
+import { ArrowRight, Check, Delete, Keyboard, Loader2, Mic, Type } from "lucide-react";
 import { ToyButton } from "./ToyButton";
+import { Modal } from "./Modal";
 import { speak, unlockAudio } from "../lib/audioManager";
 import { START_LEVELS, createLearner, saveLearner } from "../lib/mastery";
 import { extractGrade, extractName, listenForText, recognitionSupported, stopListening } from "../lib/speechRecognitionManager";
@@ -11,12 +12,44 @@ const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const TILE_COLORS = ["bg-hc-sunlight", "bg-hc-skylight", "bg-hc-mintlight", "bg-hc-tanglight", "bg-hc-corallight"];
 const gradeFor = (g) => (g === 0 ? "K" : g >= 6 ? "G6" : "G1");
 const tidy = (n) => n.trim().replace(/\s+/g, " ").toLowerCase().replace(/(^|\s|-)\p{L}/gu, (m) => m.toUpperCase());
+const fade = { initial: { y: 10, opacity: 0 }, animate: { y: 0, opacity: 1 }, exit: { y: -10, opacity: 0 } };
+
+const SpellPad = ({ open, name, setName, onClose, onDone }) => {
+  const [typing, setTyping] = useState(false);
+  const tap = (l) => {
+    if (name.length >= 16) return;
+    setName((n) => n + l);
+    speak(l.toLowerCase());
+  };
+  return (
+    <Modal open={open} onClose={onClose} testId="spell-pad">
+      <h2 className="text-center font-fredoka text-2xl font-bold">Spell your name</h2>
+      <div className="mt-3 flex min-h-[56px] items-center justify-center rounded-[1.25rem] border-[3px] border-dashed border-hc-navy bg-white px-3 font-fredoka text-3xl font-bold tracking-wider" data-testid="onboarding-name">
+        {name || <span className="text-lg font-semibold opacity-50">Your name goes here</span>}
+      </div>
+      {typing ? (
+        <input autoFocus value={name} maxLength={16} onChange={(e) => setName(e.target.value.replace(/[^\p{L}\s'-]/gu, ""))} onKeyDown={(e) => e.key === "Enter" && onDone()} className="toy-focus mt-3 w-full rounded-2xl border-[3px] border-hc-navy px-4 py-3 text-center font-fredoka text-2xl" placeholder="Type your name" aria-label="Type your name" data-testid="onboarding-name-input" />
+      ) : (
+        <div className="mt-3 grid grid-cols-7 gap-1.5" data-testid="letter-tiles">
+          {LETTERS.map((l, i) => (
+            <motion.button key={l} type="button" whileTap={{ scale: 0.85 }} onClick={() => tap(l)} className={`toy-focus aspect-square rounded-xl border-[3px] border-hc-navy font-fredoka text-xl font-bold ${TILE_COLORS[i % TILE_COLORS.length]}`} style={{ boxShadow: "0 3px 0 #1F2547" }} aria-label={`Letter ${l}`}>{l}</motion.button>
+          ))}
+        </div>
+      )}
+      <div className="mt-4 flex flex-wrap justify-center gap-2">
+        <ToyButton color="white" onClick={() => setName((n) => n.slice(0, -1))} aria-label="Remove last letter" disabled={!name}><Delete className="h-5 w-5" /> Oops</ToyButton>
+        <ToyButton color="white" onClick={() => setTyping((t) => !t)} data-testid="onboarding-toggle-typing"><Keyboard className="h-5 w-5" /> {typing ? "Tiles" : "Type"}</ToyButton>
+        <ToyButton color="mint" onClick={onDone} disabled={!tidy(name)} data-testid="spell-done"><Check className="h-5 w-5" strokeWidth={3} /> Done</ToyButton>
+      </div>
+    </Modal>
+  );
+};
 
 export default function Onboarding({ onDone }) {
   const { profile, updateProfile } = useAppState();
   const [step, setStep] = useState("hello");
   const [name, setName] = useState("");
-  const [typing, setTyping] = useState(false);
+  const [spelling, setSpelling] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [listening, setListening] = useState(false);
@@ -26,7 +59,7 @@ export default function Onboarding({ onDone }) {
   const greet = () => {
     unlockAudio();
     setStep("name");
-    speak(canListen ? "Hi, welcome! I am Hoppy the bunny. What's your name? Tap the microphone and say it, or tap the letters to spell it." : "Hi, welcome! I am Hoppy the bunny. What's your name? Tap the letters to spell it.");
+    speak(canListen ? "Hi, welcome! I am Hoppy the bunny. What's your name? Tap Say it and tell me, or tap Spell it." : "Hi, welcome! I am Hoppy the bunny. What's your name? Tap Spell it to spell it with letters.");
   };
 
   const hear = (onText) => {
@@ -35,7 +68,7 @@ export default function Onboarding({ onDone }) {
     setListening(true);
     listenForText({
       onText,
-      onDenied: () => setMicNote("The microphone is switched off. Ask a grown-up, or spell it with the letters."),
+      onDenied: () => setMicNote("The microphone is switched off. Ask a grown-up, or tap Spell it."),
       onEnd: () => setListening(false),
     });
   };
@@ -46,7 +79,7 @@ export default function Onboarding({ onDone }) {
       const n = tidy(extractName(text));
       if (!n) { setMicNote("I didn't catch that. Try again!"); return; }
       setName(n);
-      speak(`Is your name ${n}? Tap That's me! Or fix the letters.`);
+      speak(`Is your name ${n}? Tap That's me! Or tap Spell it to fix it.`);
     });
   };
 
@@ -54,23 +87,19 @@ export default function Onboarding({ onDone }) {
     if (listening) { stopListening(); return; }
     hear((text) => {
       const g = extractGrade(text);
-      if (g === null) { setMicNote("I didn't hear a grade. Try saying: grade six, or kindergarten."); speak("Try saying grade six, or kindergarten."); return; }
+      if (g === null) { setMicNote("Try saying: grade six, or kindergarten."); speak("Try saying grade six, or kindergarten."); return; }
       const note = g >= 2 && g <= 5 ? `Grade ${g} is still being built, so we'll start with Grade 1 and climb up. ` : g >= 7 ? `Grade ${g} is still being built, so we'll start with Grade 6. ` : "";
       pick(gradeFor(g), note);
     });
-  };
-
-  const tap = (l) => {
-    if (name.length >= 16) return;
-    setName((n) => n + l);
-    speak(l.toLowerCase());
   };
 
   const confirmName = () => {
     const n = tidy(name);
     if (!n) return;
     setName(n);
+    setSpelling(false);
     setStep("level");
+    setMicNote("");
     speak(`Nice to meet you, ${n}! Where shall we start?`);
   };
 
@@ -86,82 +115,64 @@ export default function Onboarding({ onDone }) {
       speak(`${note}Hooray, ${name}! Everything in ${START_LEVELS.find((l) => l.id === grade)?.label || "your level"} is open for you. Let's go!`);
       onDone(learner);
     } catch {
-      setError("Hmm, I couldn't reach the learning map. Please check the internet and try again.");
+      setError("I couldn't reach the learning map. Check the internet and try again.");
     } finally {
       setBusy(false);
     }
   };
 
-  const bubble = {
-    hello: "Hi, welcome! I am Hoppy.",
-    name: "What's your name?",
-    level: `Nice to meet you, ${name}! Where shall we start?`,
+  const heading = {
+    hello: "Hi, welcome! I'm Hoppy.",
+    name: name ? `Is your name ${name}?` : "What's your name?",
+    level: `Hi ${name}! Where shall we start?`,
   }[step];
 
   return (
-    <div className="mx-auto flex w-full flex-col items-center gap-3 text-center" data-testid="onboarding">
-      <motion.p key={bubble} initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="font-fredoka text-2xl font-bold leading-tight sm:text-4xl" aria-live="polite">
-        {bubble}
+    <div className="flex w-full flex-col items-center gap-2 text-center" data-testid="onboarding">
+      <motion.p key={heading} initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="font-fredoka text-xl font-bold leading-tight sm:text-3xl" aria-live="polite">
+        {heading}
       </motion.p>
 
       <AnimatePresence mode="wait">
         {step === "hello" && (
-          <motion.div key="hello" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -20, opacity: 0 }}>
-            <ToyButton color="coral" className="min-h-[72px] px-10 text-2xl" onClick={greet} data-testid="onboarding-say-hi">SAY HI! <ArrowRight className="h-7 w-7" strokeWidth={3} /></ToyButton>
+          <motion.div key="hello" {...fade}>
+            <ToyButton color="coral" className="min-h-[52px] px-8 text-xl" onClick={greet} data-testid="onboarding-say-hi">SAY HI! <ArrowRight className="h-6 w-6" strokeWidth={3} /></ToyButton>
           </motion.div>
         )}
 
         {step === "name" && (
-          <motion.div key="name" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -20, opacity: 0 }} className="flex w-full flex-col items-center gap-3">
-            <div className="flex min-h-[56px] w-full max-w-lg items-center justify-center gap-2 rounded-[1.5rem] border-[3px] border-dashed border-hc-navy bg-white/80 px-4 py-1 font-fredoka text-3xl font-bold tracking-wider sm:text-4xl" data-testid="onboarding-name">
-              {name || <span className="text-xl font-semibold opacity-50">Your name goes here</span>}
-            </div>
+          <motion.div key="name" {...fade} className="flex flex-wrap justify-center gap-2">
             {canListen && (
-              <ToyButton color={listening ? "coral" : "sun"} className={`min-h-[56px] px-8 text-xl ${listening ? "hc-pulse" : ""}`} onClick={sayName} data-testid="onboarding-say-name">
-                <Mic className="h-7 w-7" strokeWidth={2.5} /> {listening ? "I'm listening..." : "SAY MY NAME"}
+              <ToyButton color={listening ? "coral" : "sun"} className={`min-h-[48px] ${listening ? "hc-pulse" : ""}`} onClick={sayName} data-testid="onboarding-say-name">
+                <Mic className="h-5 w-5" strokeWidth={2.5} /> {listening ? "Listening..." : "Say it"}
               </ToyButton>
             )}
-            {micNote && <p className="font-bold" role="status">{micNote}</p>}
-            {typing ? (
-              <input autoFocus value={name} maxLength={16} onChange={(e) => setName(e.target.value.replace(/[^\p{L}\s'-]/gu, ""))} onKeyDown={(e) => e.key === "Enter" && confirmName()} className="toy-focus w-full max-w-lg rounded-2xl border-[3px] border-hc-navy px-4 py-3 text-center font-fredoka text-2xl" placeholder="Type your name" aria-label="Type your name" data-testid="onboarding-name-input" />
-            ) : (
-              <div className="grid w-full max-w-3xl grid-cols-7 gap-1.5 sm:grid-cols-9 sm:gap-2 lg:grid-cols-[repeat(13,minmax(0,1fr))]" data-testid="letter-tiles">
-                {LETTERS.map((l, i) => (
-                  <motion.button key={l} type="button" whileTap={{ scale: 0.85 }} onClick={() => tap(l)} className={`toy-focus aspect-square rounded-xl border-[3px] border-hc-navy font-fredoka text-2xl font-bold sm:text-3xl ${TILE_COLORS[i % TILE_COLORS.length]}`} style={{ boxShadow: "0 3px 0 #1F2547" }} aria-label={`Letter ${l}`}>{l}</motion.button>
-                ))}
-              </div>
-            )}
-            <div className="flex flex-wrap justify-center gap-3">
-              <ToyButton color="white" className="min-h-[56px]" onClick={() => setName((n) => n.slice(0, -1))} aria-label="Remove last letter" disabled={!name}><Delete className="h-6 w-6" /> Oops</ToyButton>
-              <ToyButton color="white" className="min-h-[56px]" onClick={() => setTyping((t) => !t)} data-testid="onboarding-toggle-typing"><Keyboard className="h-6 w-6" /> {typing ? "Letter tiles" : "Type it"}</ToyButton>
-              <ToyButton color="mint" className="min-h-[56px] px-8 text-xl" onClick={confirmName} disabled={!tidy(name)} data-testid="onboarding-name-done">THAT'S ME! <ArrowRight className="h-6 w-6" strokeWidth={3} /></ToyButton>
-            </div>
+            <ToyButton color="sky" className="min-h-[48px]" onClick={() => setSpelling(true)} data-testid="onboarding-spell"><Type className="h-5 w-5" strokeWidth={2.5} /> Spell it</ToyButton>
+            {name && <ToyButton color="mint" className="min-h-[48px]" onClick={confirmName} data-testid="onboarding-name-done">THAT'S ME! <ArrowRight className="h-5 w-5" strokeWidth={3} /></ToyButton>}
           </motion.div>
         )}
 
         {step === "level" && (
-          <motion.div key="level" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -20, opacity: 0 }} className="flex w-full flex-col items-center gap-3">
-            <div className="grid w-full gap-3 sm:grid-cols-3">
-              {START_LEVELS.map((lv) => (
-                <motion.button key={lv.id} type="button" whileHover={{ y: -4 }} whileTap={{ scale: 0.96 }} disabled={busy} onClick={() => pick(lv.id)} className={`toy-focus flex flex-col items-center gap-1 rounded-[1.75rem] border-[3px] border-hc-navy p-4 disabled:opacity-60 ${lv.color}`} style={{ boxShadow: "0 5px 0 #1F2547" }} data-testid={`start-level-${lv.id}`}>
-                  <span className="text-5xl" aria-hidden="true">{lv.emoji}</span>
-                  <span className="font-fredoka text-2xl font-bold">{lv.label}</span>
-                  <span className="text-sm font-bold opacity-80">{lv.hint}</span>
-                </motion.button>
-              ))}
-            </div>
+          <motion.div key="level" {...fade} className="flex flex-wrap items-center justify-center gap-2">
+            {START_LEVELS.map((lv) => (
+              <motion.button key={lv.id} type="button" whileHover={{ y: -3 }} whileTap={{ scale: 0.95 }} disabled={busy} onClick={() => pick(lv.id)} title={lv.hint} className={`toy-focus flex min-h-[48px] items-center gap-1.5 rounded-full border-[3px] border-hc-navy px-4 font-fredoka text-base font-bold disabled:opacity-60 sm:text-lg ${lv.color}`} style={{ boxShadow: "0 4px 0 #1F2547" }} data-testid={`start-level-${lv.id}`}>
+                <span aria-hidden="true">{lv.emoji}</span> {lv.label}
+              </motion.button>
+            ))}
             {canListen && (
-              <ToyButton color={listening ? "coral" : "sun"} className={`min-h-[60px] px-6 ${listening ? "hc-pulse" : ""}`} onClick={sayGrade} disabled={busy} data-testid="onboarding-say-grade">
-                <Mic className="h-6 w-6" strokeWidth={2.5} /> {listening ? "I'm listening..." : "Or SAY your grade"}
+              <ToyButton color={listening ? "coral" : "sun"} className={`min-h-[48px] ${listening ? "hc-pulse" : ""}`} onClick={sayGrade} disabled={busy} aria-label="Say your grade" data-testid="onboarding-say-grade">
+                <Mic className="h-5 w-5" strokeWidth={2.5} /> {listening ? "Listening..." : "Say it"}
               </ToyButton>
             )}
-            {micNote && <p className="font-bold" role="status">{micNote}</p>}
-            {busy && <p className="flex items-center gap-2 font-bold"><Loader2 className="h-5 w-5 animate-spin" /> Getting your map ready...</p>}
-            {error && <p className="rounded-2xl border-[3px] border-hc-navy bg-hc-corallight px-4 py-2 font-bold" role="alert">{error}</p>}
-            <button type="button" className="toy-focus rounded-full px-3 py-1 font-bold underline" onClick={() => setStep("name")}>Change my name</button>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {busy && <p className="flex items-center gap-2 text-sm font-bold"><Loader2 className="h-4 w-4 animate-spin" /> Getting your map ready...</p>}
+      {(micNote || error) && <p className="text-sm font-bold" role={error ? "alert" : "status"}>{error || micNote}</p>}
+      {step === "level" && !busy && <button type="button" className="toy-focus rounded-full px-2 text-sm font-bold underline" onClick={() => setStep("name")}>Change my name</button>}
+
+      <SpellPad open={spelling} name={name} setName={setName} onClose={() => setSpelling(false)} onDone={confirmName} />
     </div>
   );
 }
