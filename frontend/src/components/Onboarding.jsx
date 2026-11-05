@@ -155,12 +155,12 @@ export default function Onboarding({ onDone }) {
         {step === "level" && (
           <motion.div key="level" {...fade} className="flex flex-wrap items-center justify-center gap-2">
             {START_LEVELS.map((lv) => (
-              <motion.button key={lv.id} type="button" whileHover={{ y: -3 }} whileTap={{ scale: 0.95 }} disabled={busy} onClick={() => pick(lv.id)} title={lv.hint} className={`toy-focus flex min-h-[48px] items-center gap-1.5 rounded-full border-[3px] border-hc-navy px-4 font-fredoka text-base font-bold disabled:opacity-60 sm:text-lg ${lv.color}`} style={{ boxShadow: "0 4px 0 #1F2547" }} data-testid={`start-level-${lv.id}`}>
+              <motion.button key={lv.id} type="button" whileHover={{ y: -3 }} whileTap={{ scale: 0.95 }} disabled={busy} onClick={() => pick(lv.id)} title={lv.hint} className={`toy-focus flex min-h-[48px] items-center gap-1.5 whitespace-nowrap rounded-full border-[3px] border-hc-navy px-4 font-fredoka text-base font-bold disabled:opacity-60 sm:text-lg ${lv.color}`} style={{ boxShadow: "0 4px 0 #1F2547" }} data-testid={`start-level-${lv.id}`}>
                 <span aria-hidden="true">{lv.emoji}</span> {lv.label}
               </motion.button>
             ))}
             {canListen && (
-              <ToyButton color={listening ? "coral" : "sun"} className={`min-h-[48px] ${listening ? "hc-pulse" : ""}`} onClick={sayGrade} disabled={busy} aria-label="Say your grade" data-testid="onboarding-say-grade">
+              <ToyButton color={listening ? "coral" : "sun"} className={`min-h-[48px] whitespace-nowrap ${listening ? "hc-pulse" : ""}`} onClick={sayGrade} disabled={busy} aria-label="Say your grade" data-testid="onboarding-say-grade">
                 <Mic className="h-5 w-5" strokeWidth={2.5} /> {listening ? "Listening..." : "Say it"}
               </ToyButton>
             )}

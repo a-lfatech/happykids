@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { MessageCircle, Minus, Shuffle } from "lucide-react";
@@ -98,6 +98,22 @@ const usePosterBox = () => {
   return [ref, box];
 };
 
+const useHeight = () => {
+  const [h, setH] = useState(0);
+  const roRef = useRef(null);
+  const ref = useCallback((el) => {
+    roRef.current?.disconnect();
+    roRef.current = null;
+    if (!el) return;
+    setH(el.offsetHeight);
+    if (typeof ResizeObserver !== "undefined") {
+      roRef.current = new ResizeObserver(() => setH(el.offsetHeight));
+      roRef.current.observe(el);
+    }
+  }, []);
+  return [ref, h];
+};
+
 export const Poster = ({ name, children, hoppyLine, onPlay, onLearn, next, onLesson }) => {
   const [active, setActive] = useState(null);
   const [discover, setDiscover] = useState(false);
@@ -107,6 +123,8 @@ export const Poster = ({ name, children, hoppyLine, onPlay, onLearn, next, onLes
   const frameH = frameW / POSTER_RATIO;
   const frame = { width: frameW, height: frameH };
   const chipTop = Math.max(frameH * 0.25, frameH - box.h + 96);
+  const [bubbleRef, bubbleH] = useHeight();
+  const bubbleTop = Math.max(frameH - box.h + 88, Math.min(frameH * 0.63, frameH - bubbleH - 16));
 
   const openBubble = () => {
     unlockAudio();
@@ -179,8 +197,9 @@ export const Poster = ({ name, children, hoppyLine, onPlay, onLearn, next, onLes
                 </motion.button>
               </div>
             ) : (
-              <div key="bubble" className="absolute left-[50.2%] top-[63%] w-[min(92vw,34rem)] -translate-x-1/2">
+              <div key="bubble" className="absolute left-[50.2%] -translate-x-1/2" style={{ top: bubbleTop, width: Math.min(box.vw * 0.92, 544) }}>
                 <motion.div
+                  ref={bubbleRef}
                   initial={{ scale: 0.6, opacity: 0, y: -20 }}
                   animate={{ scale: 1, opacity: 1, y: 0 }}
                   exit={{ scale: 0.6, opacity: 0, y: -20 }}
