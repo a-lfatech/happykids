@@ -67,7 +67,7 @@ export const SiteFooter = () => (
       <div>
         <Logo className="h-14" />
         <p className="mt-3 font-fredoka text-lg font-semibold">Little minds. Big possibilities.</p>
-        <p className="mt-1 flex items-center gap-1.5 text-sm font-bold opacity-80"><Heart className="h-4 w-4 fill-hc-coral text-hc-coral" /> Inspired by a father's love.</p>
+        <p className="mt-1 flex items-center gap-1.5 text-sm font-bold opacity-80"><Heart className="h-4 w-4 fill-hc-coral text-hc-coral" /> Inspired by a father's love. Growing from Kindergarten to Grade 8.</p>
       </div>
       <div className="grid grid-cols-2 gap-3 text-base font-bold sm:grid-cols-3">
         <Link to="/about" className="hover:underline" data-testid="footer-about">About</Link>

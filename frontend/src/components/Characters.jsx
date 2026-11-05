@@ -2,11 +2,12 @@ import { motion } from "framer-motion";
 import { Sparkles, Star } from "lucide-react";
 
 export const CHARACTERS = {
-  hoppy: { img: "/hk/hoppy.png", think: "/hk/hoppy_think.png", name: "Hoppy the Bunny" },
-  froggy: { img: "/hk/froggy.png", think: "/hk/froggy_think.png", name: "Froggy the Frog" },
-  sunny: { img: "/hk/sunny.png", name: "Sunny the Chick" },
-  ellie: { img: "/hk/ellie.png", name: "Ellie the Elephant" },
-  finn: { img: "/hk/finn.png", name: "Finn the Fox" },
+  hoppy: { img: "/hk/hoppy.png", think: "/hk/hoppy_think.png", name: "Hoppy the Bunny", specialty: "Mathematics" },
+  froggy: { img: "/hk/froggy.png", think: "/hk/froggy_think.png", name: "Froggy the Frog", specialty: "Science & Discovery" },
+  sunny: { img: "/hk/sunny.png", name: "Sunny the Chick", specialty: "Reading & Language" },
+  ellie: { img: "/hk/ellie.png", name: "Ellie the Elephant", specialty: "Creativity & Art" },
+  finn: { img: "/hk/finn.png", name: "Finn the Fox", specialty: "Logic & Thinking" },
+  melody: { img: "/hk/melody.webp", name: "Melody the Music Note", specialty: "Music & Movement" },
 };
 
 const MOTION = {

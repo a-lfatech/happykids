@@ -23,6 +23,7 @@ const OBJECTIVES = {
   "think-and-play": "Patterns, sorting, odd one out, shapes and visual memory.",
   "create-and-explore": "Colour names, following instructions, tracing letters and numbers, fine motor drawing.",
   "little-discoverers": "Animal homes, senses and body, weather, sky and plant needs.",
+  "move-and-groove": "Beat, rhythm, singing, dancing, musical instruments and movement.",
 };
 
 const Gate = ({ onOpen }) => (
@@ -79,7 +80,7 @@ const ProfilesCard = () => {
             <img src={CHARACTERS[p.avatar].img} alt="" className="h-12 w-12 object-contain" />
             <input value={p.name} onChange={(e) => updateProfile(p.id, { name: e.target.value.slice(0, 20) })} aria-label="Profile name" className="min-w-0 flex-1 rounded-xl border-[3px] border-hc-navy bg-white px-3 py-2 font-bold" data-testid={`profile-name-${p.id}`} />
             <select value={p.level} onChange={(e) => updateProfile(p.id, { level: e.target.value })} aria-label="Learning level" className="rounded-xl border-[3px] border-hc-navy bg-white px-2 py-2 font-bold" data-testid={`profile-level-${p.id}`}>
-              <option value="K">Kindergarten</option><option value="G1">Grade 1</option>
+              <option value="K">Kindergarten</option><option value="G1">Grade 1</option><option value="G2">Grade 2</option>
             </select>
             {p.id !== profile.id && <ToyButton color="white" className="text-sm" onClick={() => setActive(p.id)} data-testid={`profile-select-${p.id}`}>Select</ToyButton>}
             {state.profiles.length > 1 && <button type="button" onClick={() => removeProfile(p.id)} aria-label={`Delete ${p.name}`} className="toy-btn bg-hc-corallight px-3" data-testid={`profile-delete-${p.id}`}><Trash2 className="h-5 w-5" /></button>}
@@ -89,14 +90,14 @@ const ProfilesCard = () => {
       <form onSubmit={add} className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl border-[3px] border-dashed border-hc-navy/50 p-3" data-testid="add-profile-form">
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nickname" aria-label="New nickname" className="min-w-0 flex-1 rounded-xl border-[3px] border-hc-navy bg-white px-3 py-2 font-bold" data-testid="new-profile-name" />
         <select value={avatar} onChange={(e) => setAvatar(e.target.value)} aria-label="Buddy" className="rounded-xl border-[3px] border-hc-navy bg-white px-2 py-2 font-bold" data-testid="new-profile-avatar">
-          {["hoppy", "froggy", "sunny"].map((c) => <option key={c} value={c}>{CHARACTERS[c].name}</option>)}
+          {["hoppy", "froggy", "sunny", "melody"].map((c) => <option key={c} value={c}>{CHARACTERS[c].name}</option>)}
         </select>
         <select value={level} onChange={(e) => setLevel(e.target.value)} aria-label="Level" className="rounded-xl border-[3px] border-hc-navy bg-white px-2 py-2 font-bold" data-testid="new-profile-level">
-          <option value="K">Kindergarten</option><option value="G1">Grade 1</option>
+          <option value="K">Kindergarten</option><option value="G1">Grade 1</option><option value="G2">Grade 2</option>
         </select>
         <ToyButton type="submit" color="mint" data-testid="add-profile-button"><Plus className="h-5 w-5" /> Add</ToyButton>
       </form>
-      <p className="mt-2 text-xs font-bold opacity-70">Kindergarten keeps picture questions to 3 choices and suggests gentler activities first; Grade 1 can be suggested every activity, including all stories.</p>
+      <p className="mt-2 text-xs font-bold opacity-70">Kindergarten keeps picture questions to 3 choices and suggests gentler activities first; Grade 1-2 can be suggested every activity, including all stories. More grade levels coming soon.</p>
     </section>
   );
 };
@@ -138,7 +139,7 @@ export default function ParentDashboard() {
         <div>
           <span className="rounded-full border-[3px] border-hc-navy bg-hc-lavlight px-4 py-1.5 font-fredoka font-semibold">Parents</span>
           <h1 className="mt-4 font-fredoka text-4xl font-bold sm:text-5xl">{profile.name}'s learning</h1>
-          <p className="mt-1 font-semibold opacity-80">{profile.level === "K" ? "Kindergarten" : "Grade 1"} level · switch child in the profiles list below.</p>
+          <p className="mt-1 font-semibold opacity-80">{profile.level === "K" ? "Kindergarten" : profile.level === "G1" ? "Grade 1" : "Grade 2"} level · switch child in the profiles list below.</p>
         </div>
         <AccountCard />
         <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">

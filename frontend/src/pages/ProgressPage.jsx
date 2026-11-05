@@ -31,7 +31,7 @@ export default function ProgressPage() {
           )}
         </div>
 
-        <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5" data-testid="world-progress">
+        <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="world-progress">
           {WORLDS.map((w) => {
             const acts = activitiesOf(w.id);
             const done = acts.reduce((a, x) => a + solvedCount(pdata, x.id), 0);
@@ -65,7 +65,7 @@ export default function ProgressPage() {
         <section className="mt-10">
           <h2 className="font-fredoka text-3xl font-bold">Character friends</h2>
           <p className="font-bold">Collect stars to unlock new friends. Tap a friend to make them your buddy!</p>
-          <div className="mt-5 grid grid-cols-3 gap-4 sm:grid-cols-5" data-testid="character-rewards">
+          <div className="mt-5 grid grid-cols-3 gap-4 sm:grid-cols-6" data-testid="character-rewards">
             {Object.entries(CHARACTERS).map(([id, c]) => {
               const need = AVATAR_UNLOCKS[id];
               const open = pdata.totalStars >= need;

@@ -76,7 +76,7 @@ export default function LearningDashboard() {
 
         <section className="mt-10">
           <h2 className="font-fredoka text-3xl font-bold">Learning worlds</h2>
-          <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {WORLDS.map((w, i) => <WorldCard key={w.id} w={w} i={i} onClick={() => navigate(`/world/${w.id}`)} />)}
           </div>
         </section>

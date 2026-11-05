@@ -1,16 +1,18 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, BookOpen, Heart, Puzzle, ShieldCheck, Sparkles, Star } from "lucide-react";
+import { ArrowRight, BookOpen, Brain, Code, Coins, Globe, GraduationCap, Heart, Lightbulb, Music, ShieldCheck, Sparkles, Star } from "lucide-react";
 import { PageShell } from "../components/SiteNav";
 import { ToyButton } from "../components/ToyButton";
 import { PlaygroundScene } from "../components/PlaygroundScene";
-import { WORLDS } from "../data/worlds";
+import { WORLDS, FUTURE_WORLDS } from "../data/worlds";
+import { CHARACTERS } from "../components/Characters";
 
 const FLOATERS = [
   { t: "A", c: "text-hc-coral", x: "8%", y: "22%", d: 0 }, { t: "3", c: "text-[#2F95E0]", x: "88%", y: "30%", d: 1 },
   { t: "b", c: "text-hc-mint", x: "16%", y: "62%", d: 2 }, { t: "7", c: "text-hc-tang", x: "80%", y: "64%", d: 0.5 },
   { t: "C", c: "text-[#8B6CF0]", x: "92%", y: "12%", d: 1.5 }, { t: "+", c: "text-hc-sun", x: "4%", y: "44%", d: 2.5 },
+  { t: "\u266A", c: "text-hc-coral", x: "70%", y: "18%", d: 0.8 },
 ];
 
 const Hero = () => {
@@ -29,9 +31,9 @@ const Hero = () => {
 
       <div className="relative mx-auto max-w-6xl text-center">
         <motion.img initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 180, damping: 14 }} src="/hk/logo.png" alt="HappyKids" className="mx-auto w-64 sm:w-96" data-testid="hero-logo" />
-        <h1 className="mt-2 font-fredoka text-4xl font-bold sm:text-5xl lg:text-6xl" data-testid="hero-heading">Welcome to HappyKids!</h1>
-        <p className="mx-auto mt-3 inline-block -rotate-1 rounded-full border-[3px] border-hc-navy bg-hc-sun px-5 py-2 font-fredoka text-lg font-semibold sm:text-2xl" data-testid="hero-subheading">Jump into reading, numbers and discovery!</p>
-        <p className="mx-auto mt-4 max-w-xl text-base font-bold sm:text-lg">Explore a wonderful world of learning where little minds grow through play, imagination and discovery.</p>
+        <h1 className="mt-2 font-fredoka text-4xl font-bold sm:text-5xl lg:text-6xl" data-testid="hero-heading">Little minds. Big possibilities.</h1>
+        <p className="mx-auto mt-3 inline-block -rotate-1 rounded-full border-[3px] border-hc-navy bg-hc-sun px-5 py-2 font-fredoka text-lg font-semibold sm:text-2xl" data-testid="hero-subheading">A learning companion that grows with your child</p>
+        <p className="mx-auto mt-4 max-w-xl text-base font-bold sm:text-lg">From first letters and numbers to algebra, coding and creative projects. HappyKids is a character-driven learning world for children from Kindergarten to Grade 8.</p>
         <div className="mt-6 flex flex-wrap justify-center gap-4">
           <ToyButton color="coral" className="min-h-[64px] px-8 text-xl" onClick={() => navigate("/learn")} data-testid="hero-start-learning">START LEARNING <ArrowRight className="h-6 w-6" strokeWidth={3} /></ToyButton>
           <ToyButton color="white" className="min-h-[64px] px-8 text-xl" onClick={() => document.getElementById("worlds")?.scrollIntoView({ behavior: "smooth" })} data-testid="hero-explore-worlds">EXPLORE OUR WORLDS</ToyButton>
@@ -76,12 +78,116 @@ export const WorldCard = ({ w, i, onClick }) => (
     style={{ boxShadow: "0 6px 0 #1F2547" }}
   >
     <span className="self-start rounded-full border-[3px] border-hc-navy bg-white px-2.5 font-fredoka text-sm font-bold">{w.num}</span>
-    <img src={w.icon} alt="" className="h-24 w-24 object-contain sm:h-28 sm:w-28" draggable="false" />
+    <img src={w.icon} alt="" className="h-24 w-24 object-contain sm:h-28 sm:w-28" />
     <h3 className="mt-2 font-fredoka text-2xl font-bold leading-tight">{w.title}</h3>
     <p className="font-fredoka text-base font-semibold opacity-80">{w.subject}</p>
     <p className="mt-2 flex-1 text-sm font-bold">{w.blurb}</p>
     <span className={`toy-btn mt-4 inline-flex w-full items-center justify-center gap-2 ${w.strong}`}>Explore <ArrowRight className="h-5 w-5" strokeWidth={3} /></span>
   </motion.button>
+);
+
+const CharacterShowcase = () => {
+  const navigate = useNavigate();
+  return (
+    <section className="pt-20" data-testid="characters-section">
+      <h2 className="text-center font-fredoka text-4xl font-bold sm:text-5xl">Meet Your Learning Friends</h2>
+      <p className="mt-2 text-center text-lg font-bold">Each character has a special learning superpower. They celebrate with you, guide you and grow alongside you.</p>
+      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {Object.entries(CHARACTERS).map(([id, c], i) => (
+          <motion.div
+            key={id}
+            initial={{ y: 30, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.08 }}
+            className="flex items-center gap-4 rounded-[1.75rem] border-[3px] border-hc-navy bg-white p-5"
+            style={{ boxShadow: "0 5px 0 #1F2547" }}
+            data-testid={`character-card-${id}`}
+          >
+            <img src={c.img} alt={c.name} className="hc-float h-24 w-24 shrink-0 object-contain" style={{ animationDelay: `${i * 0.3}s` }} />
+            <div>
+              <h3 className="font-fredoka text-2xl font-bold">{c.name}</h3>
+              <p className="font-fredoka text-sm font-semibold text-hc-coral">{c.specialty}</p>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+      <p className="mt-6 text-center font-bold opacity-70">As children grow, new guides and mentors join the journey for older learners.</p>
+    </section>
+  );
+};
+
+const JOURNEY_STAGES = [
+  { grade: "Kindergarten", ages: "Ages 4-5", title: "First Discoveries", desc: "Letters, numbers, colours, shapes, songs and stories. Learning through play, exploration and joy.", color: "bg-hc-sunlight", icon: "Sparkles" },
+  { grade: "Grades 1-2", ages: "Ages 6-7", title: "Building Skills", desc: "Reading fluency, addition, subtraction, science basics and writing. Structure meets excitement.", color: "bg-hc-mintlight", icon: "BookOpen" },
+  { grade: "Grades 3-4", ages: "Ages 8-9", title: "Exploring the World", desc: "Comprehension, multiplication, fractions, geography, history and interactive experiments.", color: "bg-hc-skylight", icon: "Globe" },
+  { grade: "Grades 5-6", ages: "Ages 10-11", title: "Going Deeper", desc: "Coding, financial literacy, advanced math, scientific reasoning and creative projects.", color: "bg-hc-tanglight", icon: "Code" },
+  { grade: "Grades 7-8", ages: "Ages 12-14", title: "Future Ready", desc: "Algebra, academic writing, AI literacy, entrepreneurship, media literacy and leadership.", color: "bg-hc-lavlight", icon: "GraduationCap" },
+];
+
+const JourneySection = () => (
+  <section className="pt-20" data-testid="journey-section">
+    <h2 className="text-center font-fredoka text-4xl font-bold sm:text-5xl">A Journey from Kindergarten to Grade 8</h2>
+    <p className="mt-2 text-center text-lg font-bold">One companion. Nine years. A learning experience that evolves with your child.</p>
+    <div className="mt-10 space-y-4">
+      {JOURNEY_STAGES.map((s, i) => {
+        const Icon = { Sparkles, BookOpen, Globe, Code, GraduationCap }[s.icon] || Sparkles;
+        return (
+          <motion.div
+            key={s.grade}
+            initial={{ x: i % 2 ? 30 : -30, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.1 }}
+            className={`flex items-center gap-4 rounded-[1.75rem] border-[3px] border-hc-navy p-5 ${s.color}`}
+            style={{ boxShadow: "0 5px 0 #1F2547" }}
+            data-testid={`journey-stage-${i}`}
+          >
+            <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl border-[3px] border-hc-navy bg-white"><Icon className="h-8 w-8" strokeWidth={2.5} /></span>
+            <div className="flex-1">
+              <div className="flex flex-wrap items-baseline gap-2">
+                <h3 className="font-fredoka text-2xl font-bold">{s.grade}</h3>
+                <span className="rounded-full border-2 border-hc-navy bg-white px-2 py-0.5 text-xs font-bold">{s.ages}</span>
+              </div>
+              <p className="font-fredoka text-lg font-semibold">{s.title}</p>
+              <p className="font-bold">{s.desc}</p>
+            </div>
+          </motion.div>
+        );
+      })}
+    </div>
+  </section>
+);
+
+const FUTURE_ICON_MAP = { BookOpen, Globe, Brain, Code, Coins, Lightbulb };
+
+const FutureWorldsSection = () => (
+  <section className="pt-20" data-testid="future-worlds-section">
+    <h2 className="text-center font-fredoka text-4xl font-bold sm:text-5xl">The Universe is Growing</h2>
+    <p className="mt-2 text-center text-lg font-bold">Six more worlds are on the way as your child advances through the grades.</p>
+    <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {FUTURE_WORLDS.map((w, i) => {
+        const Icon = FUTURE_ICON_MAP[w.icon] || Sparkles;
+        return (
+          <motion.div
+            key={w.title}
+            initial={{ y: 30, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.08 }}
+            className="rounded-[1.75rem] border-[3px] border-dashed border-hc-navy/50 bg-white/60 p-5"
+            data-testid={`future-world-${i}`}
+          >
+            <span className="grid h-14 w-14 place-items-center rounded-2xl border-[3px] border-hc-navy bg-hc-cream"><Icon className="h-7 w-7" strokeWidth={2.5} /></span>
+            <h3 className="mt-3 font-fredoka text-2xl font-bold">{w.title}</h3>
+            <p className="font-fredoka text-sm font-semibold opacity-80">{w.subject}</p>
+            <p className="mt-2 text-sm font-bold">{w.desc}</p>
+            <span className="mt-3 inline-block rounded-full border-2 border-hc-navy bg-hc-lavlight px-3 py-1 text-xs font-bold">Coming in later phases</span>
+          </motion.div>
+        );
+      })}
+    </div>
+  </section>
 );
 
 export default function LandingPage() {
@@ -95,21 +201,27 @@ export default function LandingPage() {
       <div className="mx-auto max-w-6xl">
         <section id="worlds" className="scroll-mt-28 pt-14" data-testid="worlds-section">
           <h2 className="text-center font-fredoka text-4xl font-bold sm:text-5xl">Our Learning Worlds</h2>
-          <p className="mt-2 text-center text-lg font-bold">Five colourful worlds. Tap one to explore!</p>
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+          <p className="mt-2 text-center text-lg font-bold">Six colourful worlds today. More on the way as your child grows.</p>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {WORLDS.map((w, i) => <WorldCard key={w.id} w={w} i={i} onClick={() => navigate(`/world/${w.id}`)} />)}
           </div>
         </section>
 
+        <CharacterShowcase />
+
+        <JourneySection />
+
         <section className="pt-20" data-testid="why-section">
-          <h2 className="font-fredoka text-4xl font-bold sm:text-5xl">Why HappyKids?</h2>
+          <h2 className="text-center font-fredoka text-4xl font-bold sm:text-5xl">Why HappyKids?</h2>
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <WhyBlock icon={Puzzle} title="Learn Through Play" text="Games, stories and songs turn practice into play." bg="bg-hc-skylight" />
-            <WhyBlock icon={Star} title="Build Confidence" text="Gentle hints and stars celebrate every effort." bg="bg-hc-sunlight" />
-            <WhyBlock icon={Sparkles} title="Discover New Skills" text="Numbers, letters, logic, art and science in one place." bg="bg-hc-mintlight" />
-            <WhyBlock icon={ShieldCheck} title="Safe for Little Learners" text="No ads, no chat and no public profiles. Ever." bg="bg-hc-lavlight" />
+            <WhyBlock icon={Sparkles} title="Learns With Your Child" text="Activities adapt to your child's level — from first counting to algebra." bg="bg-hc-skylight" />
+            <WhyBlock icon={Star} title="Builds Confidence" text="Gentle hints and stars celebrate every effort, never pressure." bg="bg-hc-sunlight" />
+            <WhyBlock icon={Music} title="Characters With Voices" text="Friendly companions guide, encourage and celebrate alongside your child." bg="bg-hc-mintlight" />
+            <WhyBlock icon={ShieldCheck} title="Safe for Every Learner" text="No ads, no chat, no public profiles. Privacy by design, always." bg="bg-hc-lavlight" />
           </div>
         </section>
+
+        <FutureWorldsSection />
 
         <section className="toy-card mt-20 grid items-center gap-6 overflow-hidden p-6 sm:p-10 md:grid-cols-[1.4fr_1fr]" data-testid="story-section">
           <div>
@@ -118,7 +230,7 @@ export default function LandingPage() {
             <div className="mt-4 space-y-3 text-lg font-semibold">
               <p>HappyKids began with a father's dream to make learning joyful, accessible and exciting for every child.</p>
               <p>We believe every child has a wonderful mind waiting to discover the world.</p>
-              <p>Through playful experiences, friendly characters and interactive adventures, we help children develop confidence, creativity and a lifelong love of learning.</p>
+              <p>Through playful experiences, friendly characters and interactive adventures, we help children develop confidence, creativity and a lifelong love of learning — from their first letters to the skills they need for the future.</p>
             </div>
           </div>
           <div className="flex items-end justify-center gap-2">

@@ -2,12 +2,31 @@ import { MISSING_PUZZLES, MORE_LESS_PUZZLES } from "../games/logic";
 import { QUIZZES } from "./quizzes";
 import { STORIES } from "./stories";
 
+export const GRADE_LEVELS = [
+  { id: "K", label: "Kindergarten", ages: "Ages 4-5", color: "bg-hc-sunlight" },
+  { id: "G1", label: "Grade 1", ages: "Ages 6-7", color: "bg-hc-mintlight" },
+  { id: "G2", label: "Grade 2", ages: "Ages 7-8", color: "bg-hc-skylight" },
+  { id: "G3", label: "Grades 3-4", ages: "Ages 8-9", color: "bg-hc-tanglight" },
+  { id: "G5", label: "Grades 5-6", ages: "Ages 10-11", color: "bg-hc-lavlight" },
+  { id: "G7", label: "Grades 7-8", ages: "Ages 12-14", color: "bg-hc-corallight" },
+];
+
+export const FUTURE_WORLDS = [
+  { title: "Word Wizards", subject: "Language & Writing", grade: "G1", desc: "Build vocabulary, write sentences and tell stories.", icon: "BookOpen" },
+  { title: "World Explorers", subject: "Geography & History", grade: "G3", desc: "Discover countries, cultures and the story of our world.", icon: "Globe" },
+  { title: "Brain Power", subject: "Logic & Strategy", grade: "G3", desc: "Advanced puzzles, strategy games and brain teasers.", icon: "Brain" },
+  { title: "Code & Create", subject: "Coding & Technology", grade: "G5", desc: "Learn to code, build apps and explore technology.", icon: "Code" },
+  { title: "Life Skills Lab", subject: "Financial Literacy", grade: "G5", desc: "Money, budgeting and everyday life skills.", icon: "Coins" },
+  { title: "Imagine & Invent", subject: "Innovation & Design", grade: "G7", desc: "Design thinking, entrepreneurship and creative projects.", icon: "Lightbulb" },
+];
+
 export const WORLDS = [
-  { id: "hop-and-count", num: "01", title: "Hop & Count", subject: "Mathematics", blurb: "Count, calculate and discover the magic of numbers!", icon: "/hk/icon_math.png", character: "froggy", card: "bg-hc-skylight", strong: "bg-hc-sky", badge: { id: "number-explorer", name: "Number Explorer" } },
-  { id: "read-and-shine", num: "02", title: "Read & Shine", subject: "Reading and Phonics", blurb: "Discover letters, sounds, words and wonderful stories!", icon: "/hk/icon_reading.png", character: "hoppy", card: "bg-hc-corallight", strong: "bg-hc-coral", badge: { id: "reading-superstar", name: "Reading Superstar" } },
-  { id: "think-and-play", num: "03", title: "Think & Play", subject: "Critical Thinking", blurb: "Solve puzzles, explore patterns and challenge your little mind!", icon: "/hk/icon_thinking.png", character: "ellie", card: "bg-hc-mintlight", strong: "bg-hc-mint", badge: { id: "puzzle-champion", name: "Puzzle Champion" } },
-  { id: "create-and-explore", num: "04", title: "Create & Explore", subject: "Creativity", blurb: "Draw, colour, imagine and bring your ideas to life!", icon: "/hk/icon_create.png", character: "finn", card: "bg-hc-tanglight", strong: "bg-hc-tang", badge: { id: "creative-genius", name: "Creative Genius" } },
-  { id: "little-discoverers", num: "05", title: "Little Discoverers", subject: "Science", blurb: "Explore nature, animals, the human body and the world around you!", icon: "/hk/icon_science.png", character: "sunny", card: "bg-hc-lavlight", strong: "bg-hc-lav", badge: { id: "little-scientist", name: "Little Scientist" } },
+  { id: "hop-and-count", num: "01", title: "Hop & Count", subject: "Mathematics", blurb: "Count, calculate and discover the magic of numbers!", icon: "/hk/icon_math.png", character: "froggy", card: "bg-hc-skylight", strong: "bg-hc-sky", badge: { id: "number-explorer", name: "Number Explorer" }, grades: ["K", "G1"] },
+  { id: "read-and-shine", num: "02", title: "Read & Shine", subject: "Reading and Phonics", blurb: "Discover letters, sounds, words and wonderful stories!", icon: "/hk/icon_reading.png", character: "hoppy", card: "bg-hc-corallight", strong: "bg-hc-coral", badge: { id: "reading-superstar", name: "Reading Superstar" }, grades: ["K", "G1"] },
+  { id: "think-and-play", num: "03", title: "Think & Play", subject: "Critical Thinking", blurb: "Solve puzzles, explore patterns and challenge your little mind!", icon: "/hk/icon_thinking.png", character: "ellie", card: "bg-hc-mintlight", strong: "bg-hc-mint", badge: { id: "puzzle-champion", name: "Puzzle Champion" }, grades: ["K", "G1"] },
+  { id: "create-and-explore", num: "04", title: "Create & Explore", subject: "Creativity", blurb: "Draw, colour, imagine and bring your ideas to life!", icon: "/hk/icon_create.png", character: "finn", card: "bg-hc-tanglight", strong: "bg-hc-tang", badge: { id: "creative-genius", name: "Creative Genius" }, grades: ["K", "G1"] },
+  { id: "little-discoverers", num: "05", title: "Little Discoverers", subject: "Science", blurb: "Explore nature, animals, the human body and the world around you!", icon: "/hk/icon_science.png", character: "sunny", card: "bg-hc-lavlight", strong: "bg-hc-lav", badge: { id: "little-scientist", name: "Little Scientist" }, grades: ["K", "G1"] },
+  { id: "move-and-groove", num: "06", title: "Move & Groove", subject: "Music & Movement", blurb: "Sing, dance, clap and feel the joy of music and movement!", icon: "/hk/icon_create.png", character: "melody", card: "bg-hc-corallight", strong: "bg-hc-coral", badge: { id: "music-star", name: "Music Star" }, grades: ["K", "G1"] },
 ];
 
 const quiz = (id, world, title, blurb, character, skill) => ({ id, world, title, blurb, character, skill, kind: "quiz", total: QUIZZES[id].length });
@@ -35,6 +54,7 @@ export const ACTIVITIES = [
   quiz("animal-homes", "little-discoverers", "Animal Homes", "Where do animals live?", "finn", "Animals & habitats"),
   quiz("my-body", "little-discoverers", "My Body & Senses", "Eyes, ears, hands and healthy food.", "hoppy", "Body & senses"),
   quiz("weather-and-sky", "little-discoverers", "Weather & Sky", "Rain, snow, sun, moon and plants.", "sunny", "Weather & space"),
+  quiz("music-and-moves", "move-and-groove", "Music & Moves", "Clap, sing and discover the joy of music!", "melody", "Music & movement"),
 ];
 
 export const activityById = (id) => ACTIVITIES.find((a) => a.id === id);
@@ -54,7 +74,7 @@ export const allBadges = (pdata) => [
   ...EXTRA_BADGES.map((b) => ({ ...b, earned: b.earned(pdata) })),
 ];
 
-export const AVATAR_UNLOCKS = { hoppy: 0, froggy: 0, sunny: 0, ellie: 5, finn: 10 };
+export const AVATAR_UNLOCKS = { hoppy: 0, froggy: 0, sunny: 0, melody: 0, ellie: 5, finn: 10 };
 
 export const dailyAdventure = (pdata, level) => {
   const pool = ACTIVITIES.filter((a) => (level === "K" ? a.kind !== "story" || a.id === "hoppys-lost-carrot" : true));
