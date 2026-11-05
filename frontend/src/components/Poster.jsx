@@ -1,44 +1,139 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { Shuffle } from "lucide-react";
 import { CHARACTERS } from "./Characters";
-import { speak, unlockAudio } from "../lib/audioManager";
+import { Modal } from "./Modal";
+import { ACTIVITIES, activityById } from "../data/worlds";
+import { sfx, speak, unlockAudio } from "../lib/audioManager";
+
+const POSTER_RATIO = 1264 / 848;
 
 const FRIENDS = [
-  { id: "ellie", x: 13, y: 46, w: 24, h: 39, line: "I'm Ellie the Elephant. Let's draw and create together!" },
-  { id: "hoppy", x: 41.5, y: 34, w: 18, h: 40, line: "I'm Hoppy the Bunny. I love counting and numbers!" },
-  { id: "finn", x: 61, y: 44, w: 12.5, h: 33, line: "I'm Finn the Fox. Puzzles are my favourite!" },
-  { id: "froggy", x: 68.5, y: 64, w: 11, h: 21, line: "Ribbit! I'm Froggy. Let's discover science!" },
-  { id: "sunny", x: 80.5, y: 64, w: 11.5, h: 23, line: "Cheep cheep! I'm Sunny. Let's read a story!" },
+  { id: "ellie", x: 12, y: 46, w: 25, h: 42, line: "I'm Ellie the Elephant. Let's draw and create together!" },
+  { id: "hoppy", x: 41, y: 33, w: 19, h: 43 },
+  { id: "finn", x: 61, y: 44, w: 13, h: 36, line: "I'm Finn the Fox. Puzzles and typing are my favourite!" },
+  { id: "froggy", x: 69.5, y: 65, w: 11, h: 24, line: "Ribbit! I'm Froggy. Let's discover science!" },
+  { id: "sunny", x: 80, y: 64, w: 13, h: 26, line: "Cheep cheep! I'm Sunny. Let's read a story!" },
 ];
 
-export const Poster = ({ name }) => {
+const DISCOVER_GAMES = ["word-slider", "missing-numbers", "trace-and-write", "memory-cards", "letter-sounds", "more-or-less"];
+const TILE_COLORS = ["bg-hc-skylight", "bg-hc-mintlight", "bg-hc-sunlight", "bg-hc-tanglight", "bg-hc-corallight", "bg-hc-lavlight"];
+
+const Sticker = ({ label, color, rotate, delay, onClick, className, testId }) => (
+  <div className={`pointer-events-none absolute ${className}`}>
+  <motion.button
+    type="button"
+    onClick={() => { unlockAudio(); sfx.hop(); onClick(); }}
+    animate={{ y: [0, -8, 0] }}
+    transition={{ repeat: Infinity, duration: 2.6, delay, ease: "easeInOut" }}
+    whileHover={{ scale: 1.1, rotate: 0 }}
+    whileTap={{ scale: 0.9 }}
+    className={`toy-focus pointer-events-auto rounded-full border-[3px] border-hc-navy px-5 py-2 font-fredoka text-xl font-bold sm:px-7 sm:text-3xl ${color}`}
+    style={{ boxShadow: "0 5px 0 #1F2547", rotate }}
+    data-testid={testId}
+  >
+    {label}
+  </motion.button>
+  </div>
+);
+
+const DiscoverMenu = ({ open, onClose, next, onLesson }) => {
+  const navigate = useNavigate();
+  const go = (path) => { onClose(); navigate(path); };
+  const surprise = () => {
+    const pick = ACTIVITIES[Math.floor(Math.random() * ACTIVITIES.length)];
+    speak(`Surprise! Let's play ${pick.title}!`);
+    go(`/play/${pick.id}`);
+  };
+  const tiles = DISCOVER_GAMES.map(activityById).filter(Boolean);
+  return (
+    <Modal open={open} onClose={onClose} testId="discover-menu">
+      <h2 className="text-center font-fredoka text-3xl font-bold">Discover!</h2>
+      <p className="mt-1 text-center font-bold">Pick something exciting to play.</p>
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <button type="button" onClick={surprise} className="toy-focus col-span-2 flex items-center justify-center gap-2 rounded-[1.5rem] border-[3px] border-hc-navy bg-hc-sun p-3 font-fredoka text-2xl font-bold" style={{ boxShadow: "0 4px 0 #1F2547" }} data-testid="discover-surprise">
+          <Shuffle className="h-7 w-7" strokeWidth={2.5} /> Surprise me!
+        </button>
+        {next && (
+          <button type="button" onClick={() => { onClose(); onLesson(next); }} className="toy-focus col-span-2 rounded-[1.5rem] border-[3px] border-hc-navy bg-hc-coral p-3 font-fredoka text-xl font-bold" style={{ boxShadow: "0 4px 0 #1F2547" }}>
+            {next.emoji} My next lesson: {next.title}
+          </button>
+        )}
+        <button type="button" onClick={() => go("/typing/rain")} className="toy-focus rounded-[1.5rem] border-[3px] border-hc-navy bg-hc-sky p-3 text-left" style={{ boxShadow: "0 4px 0 #1F2547" }}>
+          <span className="block font-fredoka text-lg font-bold leading-tight">Word Rain</span>
+          <span className="text-xs font-bold">Typing game</span>
+        </button>
+        {tiles.map((a, i) => (
+          <button key={a.id} type="button" onClick={() => go(`/play/${a.id}`)} className={`toy-focus rounded-[1.5rem] border-[3px] border-hc-navy p-3 text-left ${TILE_COLORS[i % TILE_COLORS.length]}`} style={{ boxShadow: "0 4px 0 #1F2547" }}>
+            <span className="block font-fredoka text-lg font-bold leading-tight">{a.title}</span>
+            <span className="text-xs font-bold">{a.skill}</span>
+          </button>
+        ))}
+      </div>
+    </Modal>
+  );
+};
+
+export const Poster = ({ name, children, hoppyLine, onPlay, onLearn, next, onLesson }) => {
   const [active, setActive] = useState(null);
+  const [discover, setDiscover] = useState(false);
+
   const hello = (f) => {
     unlockAudio();
     setActive(f.id);
-    speak(`Hi${name ? ` ${name}` : ""}! ${f.line}`);
+    speak(f.id === "hoppy" ? hoppyLine : `Hi${name ? ` ${name}` : ""}! ${f.line}`);
     setTimeout(() => setActive((a) => (a === f.id ? null : a)), 2600);
   };
+
   return (
-    <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2, type: "spring", stiffness: 120, damping: 16 }} className="relative mx-auto mt-8 w-full max-w-5xl" data-testid="poster">
-      <img src="/hk/large_poster.png" alt="Ellie, Hoppy, Finn, Froggy and Sunny playing in a sunny park with floating letters and numbers" className="block h-auto w-full select-none" draggable="false" />
-      {FRIENDS.map((f) => (
-        <button
-          key={f.id}
-          type="button"
-          onClick={() => hello(f)}
-          aria-label={`Say hello to ${CHARACTERS[f.id].name}`}
-          data-testid={`poster-friend-${f.id}`}
-          className="toy-focus absolute rounded-full"
-          style={{ left: `${f.x}%`, top: `${f.y}%`, width: `${f.w}%`, height: `${f.h}%` }}
+    <section className="relative -mx-4 -mt-8 flex min-h-[calc(100dvh-72px)] flex-col overflow-hidden sm:-mx-8" data-testid="landing-hero">
+      <div className="absolute inset-0" style={{ containerType: "size" }}>
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2" style={{ width: `max(100cqw, ${POSTER_RATIO * 100}cqh)`, aspectRatio: `${POSTER_RATIO}` }}>
+          <img src="/hk/playground_hero.jpg" alt="Ellie, Hoppy, Finn, Froggy and Sunny playing in a sunny park with floating letters and numbers" className="absolute inset-0 h-full w-full select-none" draggable="false" />
+          {FRIENDS.map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              onClick={() => hello(f)}
+              aria-label={`Say hello to ${CHARACTERS[f.id].name}`}
+              data-testid={`poster-friend-${f.id}`}
+              className="toy-focus absolute rounded-full"
+              style={{ left: `${f.x}%`, top: `${f.y}%`, width: `${f.w}%`, height: `${f.h}%` }}
+            >
+              <AnimatePresence>
+                {active === f.id && f.id !== "hoppy" && (
+                  <motion.span initial={{ scale: 0.5, opacity: 0, y: 10 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.6, opacity: 0 }} className="pointer-events-none absolute left-1/2 top-0 w-max -translate-x-1/2 -translate-y-full rounded-2xl border-[3px] border-hc-navy bg-white px-3 py-1.5 font-fredoka text-base font-bold sm:text-lg" style={{ boxShadow: "0 3px 0 #1F2547" }}>
+                    Hi! I'm {CHARACTERS[f.id].name.split(" ")[0]}!
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="pointer-events-none relative flex flex-1 flex-col px-3 pt-3 sm:px-8 sm:pt-5">
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0, y: -10 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 160, damping: 18 }}
+          className="pointer-events-auto relative mx-auto w-full max-w-3xl rounded-[2rem] border-[3px] border-hc-navy bg-white/90 p-4 backdrop-blur-sm sm:p-5"
+          style={{ boxShadow: "0 6px 0 #1F2547" }}
+          data-testid="hoppy-bubble"
         >
-          {active === f.id && (
-            <motion.span initial={{ scale: 0.5, opacity: 0, y: 10 }} animate={{ scale: 1, opacity: 1, y: 0 }} className="pointer-events-none absolute -top-2 left-1/2 w-max -translate-x-1/2 -translate-y-full rounded-2xl border-[3px] border-hc-navy bg-white px-3 py-1.5 font-fredoka text-sm font-bold sm:text-lg" style={{ boxShadow: "0 3px 0 #1F2547" }}>
-              Hi! I'm {CHARACTERS[f.id].name.split(" ")[0]}!
-            </motion.span>
-          )}
-        </button>
-      ))}
-    </motion.div>
+          {children}
+          <span className="absolute -bottom-[14px] left-1/2 h-6 w-6 -translate-x-1/2 rotate-45 border-b-[3px] border-r-[3px] border-hc-navy bg-white/90" aria-hidden="true" />
+        </motion.div>
+
+        <div className="relative min-h-[36vh] flex-1 sm:min-h-[42vh]">
+          <Sticker label="Play!" color="bg-hc-mint" rotate={-8} delay={0} onClick={onPlay} className="bottom-[22%] left-1 sm:left-6" testId="sticker-play" />
+          <Sticker label="Learn!" color="bg-hc-sky" rotate={8} delay={0.4} onClick={onLearn} className="bottom-[22%] right-1 sm:right-6" testId="sticker-learn" />
+          <Sticker label="Discover!" color="bg-hc-sun" rotate={0} delay={0.8} onClick={() => { speak("Let's discover something exciting!"); setDiscover(true); }} className="inset-x-0 bottom-4 flex justify-center" testId="sticker-discover" />
+        </div>
+      </div>
+
+      <DiscoverMenu open={discover} onClose={() => setDiscover(false)} next={next} onLesson={onLesson} />
+    </section>
   );
 };

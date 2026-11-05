@@ -5,7 +5,7 @@ import { ArrowRight, Brain, BookOpen, Code, Coins, Gamepad2, Globe, Heart, Keybo
 import { PageShell } from "../components/SiteNav";
 import { ToyButton } from "../components/ToyButton";
 import { WorldCard } from "../components/WorldCard";
-import { Character, CHARACTERS } from "../components/Characters";
+import { CHARACTERS } from "../components/Characters";
 import Onboarding from "../components/Onboarding";
 import GradeMap from "../components/GradeMap";
 import { Poster } from "../components/Poster";
@@ -17,33 +17,23 @@ const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior:
 
 const TYPING_WORLD = { id: "typing", num: "07", title: "Key Quest", subject: "Typing", blurb: "Learn the keyboard with lessons, a speed test and the Word Rain game!", icon: "/hk/icon_reading.png", card: "bg-hc-mintlight", strong: "bg-hc-mint" };
 
-const Clouds = () => [{ top: "12%", s: "w-40", delay: "0s" }, { top: "38%", s: "w-28", delay: "-25s" }, { top: "6%", s: "w-32", delay: "-45s" }].map((c, i) => (
-  <div key={i} className={`hk-cloud pointer-events-none absolute left-0 h-12 ${c.s} rounded-full bg-white/90`} style={{ top: c.top, animationDelay: c.delay }} aria-hidden="true">
-    <span className="absolute -top-6 left-6 h-14 w-14 rounded-full bg-white/90" />
-    <span className="absolute -top-3 left-16 h-10 w-10 rounded-full bg-white/90" />
-  </div>
-));
-
 const Welcome = ({ learner, next, onPlay }) => {
   const navigate = useNavigate();
   const hello = next ? `Hi ${learner.name}! Ready for ${next.title}?` : `Hi ${learner.name}! Ready to play?`;
   return (
-    <div className="mx-auto flex max-w-4xl flex-col items-center gap-5 text-center" data-testid="welcome-back">
-      <div className="flex items-end justify-center gap-3">
-        <Character name="hoppy" mood="celebrate" className="w-28 shrink-0 sm:w-40" testId="welcome-hoppy" />
-        <button type="button" onClick={() => { unlockAudio(); speak(hello); }} className="toy-focus relative max-w-md rounded-[1.75rem] border-[3px] border-hc-navy bg-white px-5 py-3 text-left font-fredoka text-2xl font-semibold leading-tight sm:text-4xl" style={{ boxShadow: "0 5px 0 #1F2547" }} aria-label={`${hello} Tap to hear it.`}>
-          {hello}
-        </button>
-      </div>
+    <div className="mx-auto flex flex-col items-center gap-4 text-center" data-testid="welcome-back">
+      <button type="button" onClick={() => { unlockAudio(); speak(hello); }} className="toy-focus rounded-2xl font-fredoka text-2xl font-bold leading-tight sm:text-4xl" aria-label={`${hello} Tap to hear it.`}>
+        {hello}
+      </button>
       <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
-        <ToyButton color="coral" className="min-h-[88px] flex-col !gap-0 text-2xl" onClick={() => next && onPlay(next)} disabled={!next} data-testid="hero-continue">
+        <ToyButton color="coral" className="min-h-[80px] flex-col !gap-0 text-2xl" onClick={() => next && onPlay(next)} disabled={!next} data-testid="hero-continue">
           <span className="text-3xl" aria-hidden="true">{next ? next.emoji : "⭐"}</span>
           <span>{next ? "PLAY" : "ALL DONE!"}</span>
           {next && <span className="text-sm font-bold opacity-90">{next.title}</span>}
         </ToyButton>
-        <ToyButton color="sun" className="min-h-[88px] text-2xl" onClick={() => scrollTo("map")} data-testid="hero-map"><MapIcon className="h-8 w-8" strokeWidth={2.5} /> MY MAP</ToyButton>
-        <ToyButton color="sky" className="min-h-[88px] text-2xl" onClick={() => navigate("/learn")} data-testid="hero-games"><Gamepad2 className="h-8 w-8" strokeWidth={2.5} /> GAMES</ToyButton>
-        <ToyButton color="mint" className="min-h-[88px] text-2xl" onClick={() => navigate("/typing")} data-testid="hero-typing"><Keyboard className="h-8 w-8" strokeWidth={2.5} /> TYPING</ToyButton>
+        <ToyButton color="sun" className="min-h-[80px] text-2xl" onClick={() => scrollTo("map")} data-testid="hero-map"><MapIcon className="h-8 w-8" strokeWidth={2.5} /> MY MAP</ToyButton>
+        <ToyButton color="sky" className="min-h-[80px] text-2xl" onClick={() => navigate("/learn")} data-testid="hero-games"><Gamepad2 className="h-8 w-8" strokeWidth={2.5} /> GAMES</ToyButton>
+        <ToyButton color="mint" className="min-h-[80px] text-2xl" onClick={() => navigate("/typing")} data-testid="hero-typing"><Keyboard className="h-8 w-8" strokeWidth={2.5} /> TYPING</ToyButton>
       </div>
     </div>
   );
@@ -162,20 +152,23 @@ export default function LandingPage() {
     setLearner(null);
   };
 
+  const next = nextOpenUnit(map);
+  const hoppyLine = learner
+    ? (next ? `Hi ${learner.name}! Ready for ${next.title}? Tap PLAY to start!` : `Hi ${learner.name}! Let's play a game!`)
+    : "Hi, welcome! I'm Hoppy the bunny. Tap Say hi, and tell me your name!";
+
   return (
     <PageShell testId="landing-page">
-      <section className="hk-sky relative -mx-4 -mt-8 overflow-hidden px-4 pb-16 pt-6 sm:-mx-8 sm:px-8" data-testid="landing-hero">
-        <Clouds />
-        <div className="relative mx-auto max-w-6xl">
-          <img src="/hk/logo.png" alt="HappyKids" className="mx-auto mb-4 w-44 sm:w-60" data-testid="hero-logo" />
-          {learner ? <Welcome learner={learner} next={nextOpenUnit(map)} onPlay={play} /> : <Onboarding onDone={setLearner} />}
-          <Poster name={learner?.name} />
-        </div>
-        <svg viewBox="0 0 1440 120" preserveAspectRatio="none" className="absolute inset-x-0 bottom-0 h-12 w-full" aria-hidden="true">
-          <path d="M0 70 Q240 10 520 60 T1040 50 T1440 60 V120 H0 Z" fill="#9BE28F" />
-          <path d="M0 95 Q360 55 760 90 T1440 85 V120 H0 Z" fill="#FFF6E3" />
-        </svg>
-      </section>
+      <Poster
+        name={learner?.name}
+        hoppyLine={hoppyLine}
+        next={next}
+        onLesson={play}
+        onPlay={() => scrollTo("worlds")}
+        onLearn={() => (learner ? scrollTo("map") : navigate("/learn"))}
+      >
+        {learner ? <Welcome learner={learner} next={next} onPlay={play} /> : <Onboarding onDone={setLearner} />}
+      </Poster>
 
       <div className="mx-auto max-w-6xl">
         {learner && <MapSection learner={learner} map={map} status={status} onRetry={() => load(learner)} onPlay={play} onRestart={restart} />}

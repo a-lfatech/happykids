@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Delete, Keyboard, Loader2, Mic } from "lucide-react";
-import { Character } from "./Characters";
 import { ToyButton } from "./ToyButton";
 import { speak, unlockAudio } from "../lib/audioManager";
 import { START_LEVELS, createLearner, saveLearner } from "../lib/mastery";
@@ -100,13 +99,10 @@ export default function Onboarding({ onDone }) {
   }[step];
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col items-center gap-4 text-center" data-testid="onboarding">
-      <div className="flex w-full items-end justify-center gap-3">
-        <Character name="hoppy" mood={step === "level" ? "celebrate" : "wave"} className="w-24 shrink-0 sm:w-32" testId="onboarding-hoppy" />
-        <motion.p key={bubble} initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="relative max-w-md rounded-[1.75rem] border-[3px] border-hc-navy bg-white px-5 py-3 text-left font-fredoka text-2xl font-semibold leading-tight sm:text-3xl" style={{ boxShadow: "0 5px 0 #1F2547" }} aria-live="polite">
-          {bubble}
-        </motion.p>
-      </div>
+    <div className="mx-auto flex w-full flex-col items-center gap-3 text-center" data-testid="onboarding">
+      <motion.p key={bubble} initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="font-fredoka text-2xl font-bold leading-tight sm:text-4xl" aria-live="polite">
+        {bubble}
+      </motion.p>
 
       <AnimatePresence mode="wait">
         {step === "hello" && (
@@ -117,11 +113,11 @@ export default function Onboarding({ onDone }) {
 
         {step === "name" && (
           <motion.div key="name" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -20, opacity: 0 }} className="flex w-full flex-col items-center gap-3">
-            <div className="flex min-h-[64px] w-full max-w-lg items-center justify-center gap-2 rounded-[1.5rem] border-[3px] border-dashed border-hc-navy bg-white/80 px-4 py-2 font-fredoka text-4xl font-bold tracking-wider" data-testid="onboarding-name">
+            <div className="flex min-h-[56px] w-full max-w-lg items-center justify-center gap-2 rounded-[1.5rem] border-[3px] border-dashed border-hc-navy bg-white/80 px-4 py-1 font-fredoka text-3xl font-bold tracking-wider sm:text-4xl" data-testid="onboarding-name">
               {name || <span className="text-xl font-semibold opacity-50">Your name goes here</span>}
             </div>
             {canListen && (
-              <ToyButton color={listening ? "coral" : "sun"} className={`min-h-[64px] px-8 text-xl ${listening ? "hc-pulse" : ""}`} onClick={sayName} data-testid="onboarding-say-name">
+              <ToyButton color={listening ? "coral" : "sun"} className={`min-h-[56px] px-8 text-xl ${listening ? "hc-pulse" : ""}`} onClick={sayName} data-testid="onboarding-say-name">
                 <Mic className="h-7 w-7" strokeWidth={2.5} /> {listening ? "I'm listening..." : "SAY MY NAME"}
               </ToyButton>
             )}
