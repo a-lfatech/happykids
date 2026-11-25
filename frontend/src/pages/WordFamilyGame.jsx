@@ -34,7 +34,7 @@ export default function WordFamilyGame() {
   const navigate = useNavigate();
   const [learner, setLearner] = useState(getLearner);
   const [families, setFamilies] = useState([]);
-  const [active, setActive] = useState("reading-at");
+  const [active, setActive] = useState("reading-n");
   const [mode, setMode] = useState("explore");
   const [index, setIndex] = useState(0);
   const [round, setRound] = useState(null);
@@ -196,7 +196,7 @@ export default function WordFamilyGame() {
   const renderGame = () => {
     if (bonus) return <ReadingBonus kind={bonus} words={words} say={say} onDone={finishBonus} />;
     if (mode === "explore" && shown) return <div className="reading-explore">
-      <ReadingBook word={shown} index={index} rime={family.content.rime} flip={flipPage} hear={voice.say} />
+      <ReadingBook key={active} word={shown} index={index} rime={family.content.rime} endingSound={family.content.ending_cue} flip={flipPage} hear={voice.say} />
       <div className="reading-book-actions">
         <ToyButton color="sky" className="text-lg" onClick={() => voice.say(`${shown.sound} ... ${family.content.ending_cue} ... ${shown.word}!`)}>Blend it!</ToyButton>
         <ToyButton color="mint" className="text-lg" onClick={exploreDone}><Puzzle className="h-5 w-5" /> Let's build!</ToyButton>
