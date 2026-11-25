@@ -42,6 +42,7 @@ export default function WordFamilyGame() {
   const [help, setHelp] = useState(null);
   const [highlight, setHighlight] = useState(0);
   const [solved, setSolved] = useState(false);
+  const [nextFamily, setNextFamily] = useState(null);
   const [praise, setPraise] = useState("");
   const [party, setParty] = useState(0);
   const [wins, setWins] = useState(0);
@@ -79,6 +80,7 @@ export default function WordFamilyGame() {
     const data = await rpc("hk_reading_catalog", { p_token: l.token });
     if (!Array.isArray(data)) throw new Error("Reading families could not be loaded.");
     setFamilies(data);
+    return data;
   };
 
   useEffect(() => {
@@ -97,7 +99,7 @@ export default function WordFamilyGame() {
 
   const loadRound = async () => {
     if (!learner) return;
-    setLoading(true); setError(""); setSolved(false); setHelp(null); setHighlight(0); setPraise("");
+    setLoading(true); setError(""); setSolved(false); setHelp(null); setHighlight(0); setPraise(""); setNextFamily(null);
     try {
       const data = await rpc("hk_reading_round", { p_token: learner.token, p_unit: active, p_mode: mode });
       if (!data.attempt_id || !data.visual || !Array.isArray(data.choices)) throw new Error("The reading question is incomplete.");
@@ -146,7 +148,15 @@ export default function WordFamilyGame() {
         setPraise(cheer); setParty(p => p + 1); setWins(w => w + 1);
         if (result.newly_mastered) setTimeout(() => sfx.fanfare(), 600);
         say(`${cheer} ${successMessage(result)}`);
-        await refresh();
+        const catalog = await refresh();
+        const currentIndex = catalog.findIndex(f => f.id === active);
+        if (catalog[currentIndex]?.status === 'mastered') {
+          const upcoming = catalog.slice(currentIndex + 1).find(f => f.status === 'unlocked');
+          if (upcoming) {
+            setNextFamily(upcoming);
+            say(`${cheer} Challenge complete! Ready for the ${upcoming.content.rime} words?`);
+          }
+        }
       } else {
         sfx.wrong(); setShake(choice); setTimeout(() => setShake(null), 500);
         setHelp(result.help); setHighlight(1);
@@ -158,7 +168,9 @@ export default function WordFamilyGame() {
 
   const next = () => {
     sfx.tap();
-    if (wins > 0 && wins % 3 === 0) startBonus(); else loadRound();
+    if (nextFamily) {
+      setIndex(0); setBonus(null); setSolved(false); setActive(nextFamily.id); setMode('challenge'); setNextFamily(null);
+    } else if (wins > 0 && wins % 3 === 0) startBonus(); else loadRound();
   };
 
   const askHelp = async () => {
@@ -176,7 +188,7 @@ export default function WordFamilyGame() {
   const exploreDone = async () => {
     if (busy.current || !round) return;
     busy.current = true;
-    try { await submitAnswer(learner.token, round.attempt_id, target.onset); await refresh(); sfx.hop(); setMode("build"); }
+    try { await submitAnswer(learner.token, round.attempt_id, target.onset); await refresh(); sfx.hop(); setMode("challenge"); }
     catch (e) { setError(e.message); } finally { busy.current = false; }
   };
 
@@ -199,13 +211,13 @@ export default function WordFamilyGame() {
       <ReadingBook key={active} word={shown} index={index} rime={family.content.rime} endingSound={family.content.ending_cue} flip={flipPage} hear={voice.say} />
       <div className="reading-book-actions">
         <ToyButton color="sky" className="text-lg" onClick={() => voice.say(`${shown.sound} ... ${family.content.ending_cue} ... ${shown.word}!`)}>Blend it!</ToyButton>
-        <ToyButton color="mint" className="text-lg" onClick={exploreDone}><Puzzle className="h-5 w-5" /> Let's build!</ToyButton>
+        <ToyButton color="mint" className="text-lg" onClick={exploreDone}><Puzzle className="h-5 w-5" /> Start challenge!</ToyButton>
       </div>
     </div>;
     if (loading || !target) return <p role="status" className="font-fredoka text-xl font-bold">Opening your book...</p>;
     const showWord = mode === "match" || challengeQuestion;
     return <div className={`reading-round ${showWord ? 'reading-match' : 'reading-build'}`}>
-      <h2 className="reading-round-title font-fredoka">{solved ? praise : showWord ? "Read it. Find the picture!" : mode === "challenge" ? "Word Challenge: build it!" : "Which sound starts this word?"}</h2>
+      <h2 className="reading-round-title font-fredoka">{solved ? praise : showWord ? "Read it. Find the picture!" : mode === "challenge" ? `Story challenge · ${family.best}/${family.target} stars` : "Which sound starts this word?"}</h2>
       {showWord
         ? <p className="reading-target-word font-fredoka">{target.word}</p>
         : <>
@@ -216,7 +228,7 @@ export default function WordFamilyGame() {
           </p>
         </>}
       {solved
-        ? <ToyButton color="mint" className="hc-pulse text-2xl" onClick={next}>Next word <Star className="h-6 w-6 fill-hc-sun" /></ToyButton>
+        ? <ToyButton color="mint" className="hc-pulse text-2xl" onClick={next}>{nextFamily ? `Next challenge: -${nextFamily.content.rime}` : 'Next word'} <Star className="h-6 w-6 fill-hc-sun" /></ToyButton>
         : showWord
           ? <PictureChoices words={words} choose={choose} disabled={solved} limit={help?.choices} />
           : <div className="reading-letter-choices">{choices.map(c => <motion.button key={c} type="button" whileTap={{ scale: 0.9 }} animate={shake === c ? { x: [0, -10, 10, -6, 0] } : {}} onClick={() => choose(c)}

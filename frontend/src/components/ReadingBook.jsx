@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Lock, Star, Volume2 } from "lucide-react";
 import { sfx } from "../lib/audioManager";
@@ -48,7 +48,12 @@ export function ReadingBook({ word, index, rime, endingSound, flip, hear, highli
 }
 
 export function FamilyTabs({ families, active, select }) {
-  return <div className="reading-families" aria-label="Word families">{families.map((f, i) => {
+  const tabs = useRef(null);
+  useEffect(() => {
+    const selected = tabs.current?.querySelector('[aria-pressed="true"]');
+    if (selected) tabs.current.scrollLeft = selected.offsetLeft - (tabs.current.clientWidth - selected.clientWidth) / 2;
+  }, [active, families.length]);
+  return <div ref={tabs} className="reading-families" aria-label="Word families">{families.map((f, i) => {
     const locked = f.status === "locked";
     return <button key={f.id} type="button" disabled={locked} onClick={() => { sfx.tap(); select(f.id); }} aria-pressed={active === f.id} aria-label={`${f.content.rime} family${locked ? ", locked" : ""}`}
       className={`toy-focus ${active === f.id ? "bg-hc-sun" : PAGE_COLORS[(i + 1) % PAGE_COLORS.length]}`}>
