@@ -60,6 +60,9 @@ export const sfx = {
   wrong: () => { tone(392, 0, 0.18, { type: "triangle", gain: 0.14 }); tone(330, 0.16, 0.26, { type: "triangle", gain: 0.14 }); },
   correct: () => [523, 659, 784, 1046].forEach((f, i) => tone(f, i * 0.11, 0.32, { type: "triangle", gain: 0.2 })),
   fanfare: () => [523, 659, 784, 659, 784, 1046, 1318].forEach((f, i) => tone(f, i * 0.14, i === 6 ? 0.7 : 0.25, { type: "triangle", gain: 0.2 })),
+  flip: () => { tone(1400, 0, 0.07, { type: "sawtooth", gain: 0.04, to: 500 }); tone(700, 0.06, 0.08, { type: "triangle", gain: 0.06, to: 260 }); },
+  pop: () => { tone(900, 0, 0.06, { type: "square", gain: 0.08, to: 1800 }); tone(1200, 0.05, 0.12, { type: "triangle", gain: 0.12 }); },
+  sparkle: () => [1568, 1976, 2349, 2637].forEach((f, i) => tone(f, 0.35 + i * 0.07, 0.18, { type: "sine", gain: 0.08 })),
 };
 
 const PREFERRED = ["samantha", "karen", "moira", "tessa", "serena", "victoria", "google uk english female", "google us english", "aria", "jenny", "zira", "libby", "sonia", "natasha", "female"];
