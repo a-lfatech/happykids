@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowLeft, BookOpen, Image, Lightbulb, Mic, Pause, Puzzle, Star, Trophy, Volume2 } from "lucide-react";
 import { ToyButton } from "../components/ToyButton";
 import { Character } from "../components/Characters";
@@ -12,6 +12,7 @@ import { createLearner, getHelp, getLearner, saveLearner, submitAnswer } from ".
 import { supabase } from "../lib/supabase";
 import { sfx, stopSpeaking } from "../lib/audioManager";
 import useVoice from "../hooks/useVoice";
+import "./WordFamilyGame.css";
 import { listenForText, recognitionSupported, stopListening } from "../lib/speechRecognitionManager";
 
 const MODES = [
@@ -54,6 +55,19 @@ export default function WordFamilyGame() {
   const [loading, setLoading] = useState(true);
   const [listening, setListening] = useState(false);
   const busy = useRef(false);
+  const playArea = useRef(null);
+  useEffect(() => {
+    const element = playArea.current;
+    const resize = () => {
+      element.style.setProperty('--play-height', `${element.clientHeight}px`);
+      element.style.setProperty('--play-width', `${element.clientWidth}px`);
+    };
+    resize();
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(resize) : null;
+    observer?.observe(element);
+    window.addEventListener('resize', resize);
+    return () => { observer?.disconnect(); window.removeEventListener('resize', resize); };
+  }, []);
   const voice = useVoice();
   const family = families.find(f => f.id === active);
   const words = family?.content.words || [];
@@ -181,22 +195,22 @@ export default function WordFamilyGame() {
 
   const renderGame = () => {
     if (bonus) return <ReadingBonus kind={bonus} words={words} say={say} onDone={finishBonus} />;
-    if (loading || !target) return <p role="status" className="font-fredoka text-2xl font-bold">Turning the page...</p>;
-    if (mode === "explore" && shown) return <div className="flex h-full w-full max-w-2xl flex-col">
+    if (mode === "explore" && shown) return <div className="reading-explore">
       <ReadingBook word={shown} index={index} rime={family.content.rime} flip={flipPage} hear={voice.say} />
-      <div className="mt-3 flex shrink-0 justify-center gap-3">
+      <div className="reading-book-actions">
         <ToyButton color="sky" className="text-lg" onClick={() => voice.say(`${shown.sound} ... ${family.content.ending_cue} ... ${shown.word}!`)}>Blend it!</ToyButton>
         <ToyButton color="mint" className="text-lg" onClick={exploreDone}><Puzzle className="h-5 w-5" /> Let's build!</ToyButton>
       </div>
     </div>;
+    if (loading || !target) return <p role="status" className="font-fredoka text-xl font-bold">Opening your book...</p>;
     const showWord = mode === "match" || challengeQuestion;
-    return <div className="relative flex h-full w-full max-w-2xl flex-col items-center justify-center gap-3 rounded-3xl border-[3px] border-hc-navy bg-white/90 p-3 text-center shadow-[0_6px_0_#1F2547] sm:gap-5 sm:p-6">
-      <h2 className="font-fredoka text-xl font-bold sm:text-2xl">{showWord ? "Read it. Find the picture!" : mode === "challenge" ? "Word Challenge: build it!" : "Which sound starts this word?"}</h2>
+    return <div className={`reading-round ${showWord ? 'reading-match' : 'reading-build'}`}>
+      <h2 className="reading-round-title font-fredoka">{solved ? praise : showWord ? "Read it. Find the picture!" : mode === "challenge" ? "Word Challenge: build it!" : "Which sound starts this word?"}</h2>
       {showWord
-        ? <p className="font-fredoka font-bold" style={{ fontSize: "clamp(4rem, 18vmin, 9rem)", lineHeight: 1 }}>{target.word}</p>
+        ? <p className="reading-target-word font-fredoka">{target.word}</p>
         : <>
-          <button type="button" onClick={() => voice.say(target.word)} aria-label={`Picture of ${target.word}`} style={{ fontSize: "clamp(4rem, 16vmin, 8rem)", lineHeight: 1 }}>{target.picture}</button>
-          <p className="font-fredoka font-bold" style={{ fontSize: "clamp(3.5rem, 14vmin, 7rem)", lineHeight: 1 }}>
+          <button className="reading-target-picture" type="button" onClick={() => voice.say(target.word)} aria-label={`Picture of ${target.word}`}>{target.picture}</button>
+          <p className="reading-build-word font-fredoka">
             <span className={`inline-block min-w-[1.2em] rounded-2xl border-[3px] border-dashed border-hc-navy px-2 ${solved ? "bg-hc-mintlight" : highlight === 1 ? "bg-hc-sun" : "bg-hc-skylight"}`}>{solved ? target.onset : "?"}</span>
             <span className={`rounded-2xl px-2 ${highlight === 2 ? "bg-hc-sun" : ""}`}>{target.rime}</span>
           </p>
@@ -205,14 +219,12 @@ export default function WordFamilyGame() {
         ? <ToyButton color="mint" className="hc-pulse text-2xl" onClick={next}>Next word <Star className="h-6 w-6 fill-hc-sun" /></ToyButton>
         : showWord
           ? <PictureChoices words={words} choose={choose} disabled={solved} limit={help?.choices} />
-          : <div className="flex flex-wrap justify-center gap-3">{choices.map(c => <motion.button key={c} type="button" whileTap={{ scale: 0.9 }} animate={shake === c ? { x: [0, -10, 10, -6, 0] } : {}} onClick={() => choose(c)}
-            className="toy-btn bg-hc-sky font-fredoka font-bold" style={{ fontSize: "clamp(2.25rem, 9vmin, 4rem)", minWidth: "clamp(4.5rem, 18vmin, 7rem)", minHeight: "clamp(4.5rem, 18vmin, 7rem)" }}>{c}</motion.button>)}</div>}
-      <AnimatePresence>{praise && <motion.div key={party} initial={{ scale: 0, rotate: -12 }} animate={{ scale: 1, rotate: -6 }} exit={{ scale: 0 }} transition={{ type: "spring", stiffness: 300, damping: 12 }}
-        className="pointer-events-none absolute -top-3 right-2 rounded-2xl border-[3px] border-hc-navy bg-hc-sun px-3 py-1 font-fredoka text-xl font-bold shadow-[0_4px_0_#1F2547] sm:text-2xl">{praise}</motion.div>}</AnimatePresence>
+          : <div className="reading-letter-choices">{choices.map(c => <motion.button key={c} type="button" whileTap={{ scale: 0.9 }} animate={shake === c ? { x: [0, -10, 10, -6, 0] } : {}} onClick={() => choose(c)}
+            className="toy-focus bg-hc-sky font-fredoka font-bold">{c}</motion.button>)}</div>}
     </div>;
   };
 
-  return <div data-testid="word-family-game" className="relative flex h-screen flex-col overflow-hidden bg-gradient-to-br from-hc-skylight via-hc-vanilla to-hc-corallight text-hc-navy" style={{ height: "100dvh" }}>
+  return <div data-testid="word-family-game" className="reading-game relative flex h-screen flex-col overflow-hidden bg-gradient-to-br from-hc-skylight via-hc-vanilla to-hc-corallight text-hc-navy" style={{ height: "100dvh" }}>
     <span className="pointer-events-none absolute left-4 top-24 text-4xl opacity-30 hc-float" aria-hidden="true">⭐</span>
     <span className="pointer-events-none absolute bottom-28 right-6 text-5xl opacity-30 hc-float" aria-hidden="true">🌈</span>
     {party > 0 && solved && <div key={party} className="pointer-events-none fixed inset-0 z-40"><Confetti count={36} /></div>}
@@ -226,7 +238,7 @@ export default function WordFamilyGame() {
     </header>
 
     <div className="relative z-10 flex shrink-0 flex-col items-center gap-1 px-3 pt-2">
-      <FamilyTabs families={families} active={active} select={id => { setIndex(0); setActive(id); }} />
+      <FamilyTabs families={families} active={active} select={id => { setBonus(null); setIndex(0); setActive(id); }} />
       <nav className="flex max-w-full gap-2 overflow-x-auto py-1" aria-label="Game modes">{MODES.map(({ id, label, icon: Icon, color }) => (
         <button key={id} type="button" aria-pressed={mode === id} onClick={() => { sfx.tap(); setBonus(null); setMode(id); }}
           className={`toy-focus flex shrink-0 items-center gap-1 rounded-full border-[3px] border-hc-navy px-3 py-1 text-sm font-bold sm:text-base ${mode === id ? "bg-hc-navy text-white" : color}`}><Icon className="h-4 w-4" />{label}</button>
@@ -235,9 +247,9 @@ export default function WordFamilyGame() {
 
     {error && <div role="alert" className="relative z-10 mx-3 mt-1 flex shrink-0 items-center justify-between gap-2 rounded-2xl bg-hc-corallight p-2 font-bold">{error}<ToyButton color="white" onClick={() => learner ? loadRound() : window.location.reload()}>Try again</ToyButton></div>}
 
-    <main className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center px-3 py-3">{renderGame()}</main>
+    <main ref={playArea} className="reading-play-area relative z-10">{renderGame()}</main>
 
-    <footer className="relative z-10 flex shrink-0 items-center gap-2 px-3 pb-3">
+    <footer className="reading-instructions relative z-10">
       <Character name="hoppy" mood={solved || bonus ? "celebrate" : "talking"} className="w-12 shrink-0 sm:w-16" />
       <div className="flex min-w-0 flex-1 items-center gap-1 rounded-2xl border-[3px] border-hc-navy bg-white px-3 py-1">
         <p aria-live="polite" className="line-clamp-2 flex-1 text-sm font-bold sm:text-lg">{feedback}</p>

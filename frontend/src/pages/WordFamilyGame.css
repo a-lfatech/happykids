@@ -1,0 +1,69 @@
+.reading-game { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.reading-game > header { padding: 8px 12px 4px; }
+.reading-game .toy-btn { min-height: 44px; border-radius: 14px; padding: 4px 12px; box-shadow: 0 3px 0 #1f2547; }
+.reading-game > header h1 { font-size: clamp(18px, 3vw, 28px); }
+.reading-game > header > div { height: 40px; }
+.reading-game > header + div { padding-top: 0; gap: 0; }
+.reading-game nav { padding: 4px 0; gap: 4px; }
+.reading-game nav button { min-height: 36px; padding: 4px 8px; font-size: 13px; }
+.reading-families { display: flex; justify-content: center; gap: 8px; max-width: 100%; padding: 4px; }
+.reading-families button { display: flex; align-items: center; gap: 4px; border: 2px solid #1f2547; border-radius: 12px; padding: 4px 12px; min-height: 32px; font-weight: 700; font-size: 17px; }
+.reading-families button:disabled { opacity: .5; }
+.reading-play-area { flex: 1 1 0; min-height: 0; display: flex; align-items: stretch; justify-content: center; padding: 8px 12px 12px; --play-height: 360px; --play-width: 360px; }
+.reading-explore { width: 100%; max-width: 760px; min-height: 0; display: grid; grid-template-rows: minmax(0, 1fr) 44px; gap: 8px; }
+.reading-book { display: grid; min-height: 0; grid-template-rows: minmax(0, 1fr) minmax(48px, 23%); gap: 8px; }
+.reading-book-cover { position: relative; min-height: 0; border: 3px solid #1f2547; border-radius: 20px; padding: 20px 12px 12px; background: #ff9a52; box-shadow: 0 4px 0 #1f2547; }
+.reading-rings { position: absolute; top: -4px; left: 24px; right: 24px; display: flex; justify-content: space-around; z-index: 2; }
+.reading-rings span { height: 24px; width: 10px; border-radius: 8px; background: linear-gradient(90deg, #8c9da9, white, #8c9da9); border: 2px solid #1f2547; }
+.reading-pages { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; height: 100%; min-height: 0; perspective: 900px; }
+.reading-page { position: relative; min-height: 0; min-width: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; border: 2px solid #1f2547; border-radius: 12px; box-shadow: 0 4px 0 #fff, 0 6px 0 #1f2547; color: #1f2547; }
+.reading-page small { position: absolute; top: 6px; font-size: 12px; font-weight: 700; letter-spacing: .04em; }
+.reading-page > span, .reading-turn { font-family: Fredoka, sans-serif; font-size: min(calc(var(--play-height) * .25), calc(var(--play-width) * .23), 140px); font-weight: 700; line-height: 1; }
+.reading-turn { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; backface-visibility: hidden; pointer-events: none; }
+.reading-flip-controls { display: grid; grid-template-columns: 56px minmax(0, 1fr) 56px; align-items: stretch; gap: 8px; min-height: 0; }
+.reading-flip-button { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid #1f2547; border-radius: 12px; box-shadow: 0 3px 0 #1f2547; font-weight: 700; font-size: 12px; color: #1f2547; }
+.reading-flip-button svg { width: 28px; height: 28px; stroke-width: 3; }
+.reading-whole-word { min-width: 0; display: flex; align-items: center; justify-content: center; gap: 8px; border: 2px solid #1f2547; border-radius: 12px; background: #fff; color: #1f2547; }
+.reading-whole-word > span { font-size: min(calc(var(--play-height) * .13), 64px); line-height: 1; }
+.reading-whole-word strong { font-family: Fredoka, sans-serif; font-size: min(calc(var(--play-height) * .13), calc(var(--play-width) * .12), 64px); line-height: 1; }
+.reading-word-sound { width: 18px; flex-shrink: 0; }
+.reading-book-actions { display: flex; align-items: stretch; justify-content: center; gap: 8px; }
+.reading-book-actions .toy-btn { font-size: 16px; }
+.reading-round { position: relative; display: grid; width: 100%; max-width: 760px; min-height: 0; padding: 8px 12px; gap: 8px; text-align: center; border: 3px solid #1f2547; border-radius: 20px; background: #fffaf0; box-shadow: 0 4px 0 #1f2547; justify-items: center; }
+.reading-build { grid-template-rows: 28px minmax(0, 1fr) minmax(0, 1fr) minmax(44px, 23%); }
+.reading-match { grid-template-rows: 28px minmax(0, 1fr) minmax(44px, 32%); }
+.reading-round-title { position: static; align-self: center; font-size: clamp(14px, 2.3vw, 20px); font-weight: 700; line-height: 1.2; margin: 0; }
+.reading-target-picture { font-size: min(calc(var(--play-height) * .22), 110px); line-height: 1; align-self: center; }
+.reading-build-word { align-self: center; margin: 0; white-space: nowrap; font-size: min(calc(var(--play-height) * .21), calc(var(--play-width) * .18), 100px); line-height: 1.1; font-weight: 700; }
+.reading-build-word > span { border-radius: 12px; }
+.reading-target-word { margin: 0; align-self: center; font-weight: 700; line-height: 1.1; font-size: min(calc(var(--play-height) * .32), calc(var(--play-width) * .23), 140px); }
+.reading-letter-choices, .reading-picture-choices { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; max-width: 520px; gap: 8px; min-height: 0; }
+.reading-letter-choices button, .reading-picture-choices button { min-width: 0; min-height: 0; display: flex; align-items: center; justify-content: center; border: 2px solid #1f2547; border-radius: 12px; box-shadow: 0 3px 0 #1f2547; color: #1f2547; font-size: min(calc(var(--play-height) * .12), 56px); line-height: 1; }
+.reading-picture-choices button span { font-size: min(calc(var(--play-height) * .17), calc(var(--play-width) * .13), 76px); line-height: 1; }
+.reading-instructions { display: flex; flex: 0 0 64px; align-items: center; gap: 8px; height: 64px; padding: 0 12px 8px; background: #d4eeff; border-top: 2px solid #a8c9d9; }
+.reading-instructions > div:first-child { width: 40px; flex-shrink: 0; }
+.reading-instructions > div:nth-child(2) { height: 48px; padding: 4px 8px; }
+.reading-instructions p { font-size: 12px; line-height: 1.35; }
+.reading-instructions button svg { width: 20px; height: 20px; }
+@media (min-width: 768px) and (min-height: 700px) {
+  .reading-game > header { padding: 16px 24px 8px; }
+  .reading-game nav button { min-height: 44px; font-size: 16px; padding: 4px 16px; }
+  .reading-families button { min-height: 40px; font-size: 20px; }
+  .reading-instructions { flex-basis: 80px; height: 80px; }
+  .reading-instructions p { font-size: 16px; }
+  .reading-explore { grid-template-rows: minmax(0, 1fr) 48px; gap: 12px; }
+  .reading-flip-controls { grid-template-columns: 80px minmax(0, 1fr) 80px; }
+}
+@media (max-height: 500px) and (min-width: 560px) {
+  .reading-game > header { padding-top: 4px; }
+  .reading-game > header + div { flex-direction: row; justify-content: center; gap: 16px; }
+  .reading-play-area { padding-top: 4px; padding-bottom: 8px; }
+  .reading-instructions { flex-basis: 48px; height: 48px; padding-bottom: 4px; }
+  .reading-instructions > div:nth-child(2) { height: 40px; }
+  .reading-explore { grid-template-columns: minmax(0, 1fr) 120px; grid-template-rows: minmax(0, 1fr); }
+  .reading-book-actions { flex-direction: column; justify-content: center; }
+  .reading-page small { font-size: 10px; top: 2px; }
+  .reading-build { grid-template-columns: 1fr 1fr; grid-template-rows: 24px minmax(0, 1fr) 48px; }
+  .reading-round-title { grid-column: 1 / -1; }
+  .reading-letter-choices, .reading-build > .toy-btn { grid-column: 1 / -1; }
+}
