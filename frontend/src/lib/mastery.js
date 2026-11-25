@@ -17,7 +17,10 @@ export const getLearner = () => {
   }
 };
 
-export const saveLearner = (l) => localStorage.setItem(KEY, JSON.stringify(l));
+export const saveLearner = (l, notify = true) => {
+  localStorage.setItem(KEY, JSON.stringify(l));
+  if (notify) window.dispatchEvent(new CustomEvent("hk-learner-saved", { detail: l }));
+};
 export const clearLearner = () => localStorage.removeItem(KEY);
 
 const FRIENDLY = {

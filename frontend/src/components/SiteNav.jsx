@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Heart, Menu, Star, X } from "lucide-react";
 import { useAppState } from "../context/AppState";
 import { ToyButton } from "./ToyButton";
+import { PlayerSwitch } from "./PlayerSwitch";
 
 const LINKS = [
   { to: "/", label: "Home", id: "home" },
@@ -39,6 +40,7 @@ export const SiteNav = () => {
           ))}
         </ul>
         <div className="flex items-center gap-2">
+          <PlayerSwitch />
           <span className="hidden h-12 items-center gap-1.5 rounded-2xl border-[3px] border-hc-navy bg-hc-sunlight px-3 font-fredoka text-lg font-bold sm:flex" data-testid="nav-stars" aria-label={`${pdata.totalStars} stars`}>
             <Star className="h-5 w-5 fill-hc-sun" strokeWidth={2.5} /> {pdata.totalStars}
           </span>

@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, BookOpen, Image, Lightbulb, Mic, Pause, Puzzle, Star, Trophy, Volume2 } from "lucide-react";
 import { ToyButton } from "../components/ToyButton";
+import { PlayerSwitch } from "../components/PlayerSwitch";
+import { useAppState } from "../context/AppState";
 import { Character } from "../components/Characters";
 import { Modal } from "../components/Modal";
 import { Confetti } from "../components/Confetti";
@@ -32,6 +34,7 @@ async function rpc(name, args) {
 
 export default function WordFamilyGame() {
   const navigate = useNavigate();
+  const { profile } = useAppState();
   const [learner, setLearner] = useState(getLearner);
   const [families, setFamilies] = useState([]);
   const [active, setActive] = useState("reading-n");
@@ -88,7 +91,7 @@ export default function WordFamilyGame() {
     (async () => {
       try {
         let l = learner;
-        if (!l) { const result = await createLearner("K"); l = { ...result, name: "Reader" }; saveLearner(l); }
+        if (!l) { const result = await createLearner("K"); l = { ...result, name: profile.name }; saveLearner(l); }
         if (!cancelled) { setLearner(l); await refresh(l); }
       } catch (e) { if (!cancelled) setError(e.message); }
       finally { if (!cancelled) setLoading(false); }
@@ -245,6 +248,7 @@ export default function WordFamilyGame() {
 
     <header className="relative z-10 flex shrink-0 items-center gap-2 px-3 pt-3">
       <ToyButton color="white" className="px-3" onClick={() => navigate("/world/read-and-shine")} aria-label="Back to Read & Shine"><ArrowLeft className="h-6 w-6" strokeWidth={3} /></ToyButton>
+      <PlayerSwitch />
       <h1 className="min-w-0 flex-1 truncate font-fredoka text-xl font-bold sm:text-3xl">Word Family Flip</h1>
       <div className="flex h-12 items-center gap-1 rounded-2xl border-[3px] border-hc-navy bg-hc-sunlight px-2 font-fredoka text-lg font-bold" aria-label={family ? `${family.best} of ${family.target} stars` : "Stars"}><Star className="h-5 w-5 fill-hc-sun" />{family ? `${family.best}/${family.target}` : 0}</div>
       {stickers.length > 0 && <div className="hidden h-12 items-center rounded-2xl border-[3px] border-hc-navy bg-white px-2 text-2xl sm:flex" aria-label={`${stickers.length} stickers`}>{stickers.slice(-4).join("")}</div>}

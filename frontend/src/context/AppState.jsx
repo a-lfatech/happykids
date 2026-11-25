@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { configure, onSpeechFail, setMusic, unlockAudio } from "../lib/audioManager";
 import { supabase } from "../lib/supabase";
+import { clearLearner, getLearner } from "../lib/mastery";
 
 const KEY = "hopcount_progress_v1";
 const blankData = () => ({ games: {}, totalStars: 0, recent: [] });
@@ -21,6 +22,17 @@ const Ctx = createContext(null);
 export function AppStateProvider({ children }) {
   const [state, setState] = useState(load);
   const [audioHelp, setAudioHelp] = useState(false);
+
+  useEffect(() => {
+    const remember = (learner) => {
+      if (!learner) return;
+      setState(s => ({ ...s, updatedAt: Date.now(), profiles: s.profiles.map(p => p.id === s.activeId ? { ...p, learner } : p) }));
+    };
+    remember(getLearner());
+    const saved = e => remember(e.detail);
+    window.addEventListener("hk-learner-saved", saved);
+    return () => window.removeEventListener("hk-learner-saved", saved);
+  }, []);
   const [user, setUser] = useState(null);
   const [cloud, setCloud] = useState("idle");
   const syncReady = useRef(false);
@@ -88,9 +100,9 @@ export function AppStateProvider({ children }) {
   }), [mutate]);
   const resetProgress = useCallback((id) => setState((s) => ({ ...s, updatedAt: Date.now(), data: { ...s.data, [id || s.activeId]: blankData() } })), []);
 
-  const addProfile = useCallback((name, avatar, level) => setState((s) => {
+  const addProfile = useCallback((name, avatar, level, learner) => setState((s) => {
     const id = `p${Date.now()}`;
-    return { ...s, updatedAt: Date.now(), profiles: [...s.profiles, { id, name, avatar, level }], data: { ...s.data, [id]: blankData() }, activeId: id };
+    return { ...s, updatedAt: Date.now(), profiles: [...s.profiles, { id, name, avatar, level, learner }], data: { ...s.data, [id]: blankData() }, activeId: id };
   }), []);
   const updateProfile = useCallback((id, patch) => setState((s) => ({ ...s, updatedAt: Date.now(), profiles: s.profiles.map((p) => (p.id === id ? { ...p, ...patch } : p)) })), []);
   const removeProfile = useCallback((id) => setState((s) => {
@@ -100,7 +112,13 @@ export function AppStateProvider({ children }) {
     delete data[id];
     return { ...s, updatedAt: Date.now(), profiles, data, activeId: s.activeId === id ? profiles[0].id : s.activeId };
   }), []);
-  const setActive = useCallback((id) => setState((s) => ({ ...s, activeId: id })), []);
+  const setActive = useCallback((id) => setState((s) => {
+    const selected = s.profiles.find(p => p.id === id);
+    if (!selected) return s;
+    if (selected.learner) localStorage.setItem("hk_learner_v1", JSON.stringify(selected.learner));
+    else clearLearner();
+    return { ...s, activeId: id, updatedAt: Date.now() };
+  }), []);
 
   const logout = useCallback(async () => {
     await supabase.auth.signOut();

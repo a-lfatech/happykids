@@ -45,8 +45,8 @@ const SpellPad = ({ open, name, setName, onClose, onDone }) => {
   );
 };
 
-export default function Onboarding({ onDone }) {
-  const { profile, updateProfile } = useAppState();
+export default function Onboarding({ onDone, newPlayer = false }) {
+  const { profile, updateProfile, addProfile } = useAppState();
   const [step, setStep] = useState("hello");
   const [name, setName] = useState("");
   const [spelling, setSpelling] = useState(false);
@@ -110,8 +110,9 @@ export default function Onboarding({ onDone }) {
       const res = await createLearner(grade);
       if (!res.token) throw new Error("network");
       const learner = { token: res.token, name, startGrade: res.start_grade || grade };
-      saveLearner(learner);
-      updateProfile(profile.id, { name, ...(grade === "G6" ? {} : { level: grade }) });
+      saveLearner(learner, !newPlayer);
+      if (newPlayer) addProfile(name, "hoppy", grade, learner);
+      else updateProfile(profile.id, { name, learner, ...(grade === "G6" ? {} : { level: grade }) });
       speak(`${note}Hooray, ${name}! Everything in ${START_LEVELS.find((l) => l.id === grade)?.label || "your level"} is open for you. Let's go!`);
       onDone(learner);
     } catch {

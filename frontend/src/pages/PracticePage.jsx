@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Eye, Lightbulb, Loader2, Map as MapIcon, RefreshCw, Volume2, X } from "lucide-react";
 import { Character } from "../components/Characters";
 import { ToyButton } from "../components/ToyButton";
+import { PlayerSwitch } from "../components/PlayerSwitch";
 import { Confetti } from "../components/Confetti";
 import { StarRow } from "../components/GradeMap";
 import QuestionVisual, { demoSteps } from "../components/QuestionVisual";
@@ -178,6 +179,7 @@ export default function PracticePage() {
       <header className="flex shrink-0 items-center gap-2">
         <ToyButton color="white" className="h-12 px-3" onClick={() => navigate("/#map")} aria-label="Back to my map" data-testid="practice-back"><ArrowLeft className="h-6 w-6" strokeWidth={3} /></ToyButton>
         <p className="min-w-0 flex-1 truncate font-fredoka text-lg font-bold sm:text-2xl">{q ? q.unit_title : "Practice"}</p>
+        <PlayerSwitch />
         <div className="flex flex-col items-end rounded-2xl border-[3px] border-hc-navy bg-white px-3 py-1" data-testid="practice-stars">
           <StarRow best={progress.best} target={progress.target} size="h-5 w-5 sm:h-6 sm:w-6" />
           <span className="hidden text-xs font-bold sm:block">{progress.best >= progress.target ? "Mastered!" : `${progress.target} stars open the next one`}</span>

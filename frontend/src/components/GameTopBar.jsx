@@ -7,6 +7,7 @@ import { Modal } from "./Modal";
 import { ProgressDots } from "./ProgressDots";
 import { ToyButton } from "./ToyButton";
 import { Character } from "./Characters";
+import { PlayerSwitch } from "./PlayerSwitch";
 
 export const GameTopBar = ({ statuses, stars, onMicOn, onMicOff, character, backTo = "/learn" }) => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ export const GameTopBar = ({ statuses, stars, onMicOn, onMicOff, character, back
         <ProgressDots statuses={statuses} />
       </div>
       <div className="flex items-center gap-2">
+        <PlayerSwitch />
         <div className="flex h-14 items-center gap-1.5 rounded-2xl border-[3px] border-hc-navy bg-hc-sunlight px-3 font-fredoka text-xl font-bold" data-testid="session-stars" aria-label={`${stars} stars this game`}>
           <Star className="h-6 w-6 fill-hc-sun" strokeWidth={2.5} /> {stars}
         </div>

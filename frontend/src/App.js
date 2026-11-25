@@ -21,10 +21,11 @@ import LegalPage from "./pages/LegalPage";
 
 function AnimatedRoutes() {
   const location = useLocation();
+  const { profile } = useAppState();
   useEffect(() => { if (!location.hash) window.scrollTo(0, 0); }, [location.pathname, location.hash]);
   return (
     <AnimatePresence mode="wait">
-      <motion.div key={location.pathname} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -14 }} transition={{ duration: 0.25 }}>
+      <motion.div key={`${profile.id}:${location.pathname}`} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -14 }} transition={{ duration: 0.25 }}>
         <Routes location={location}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/learn" element={<LearningDashboard />} />
