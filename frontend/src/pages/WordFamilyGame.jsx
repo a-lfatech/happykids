@@ -119,11 +119,13 @@ export default function WordFamilyGame() {
     else loadRound();
   };
 
+  const ending = (family?.content?.ending_cue || family?.content?.rime || "").split(",")[0];
+
   const flipPage = (delta) => {
     const next = (index + delta + words.length) % words.length;
     setIndex(next);
     const w = words[next];
-    voice.say(`${w.sound} ... ${family.content.ending_cue} ... ${w.word}!`);
+    voice.say(`${w.sound} ... ${ending} ... ${w.word}!`);
     setFeedback(`${w.onset} + ${family.content.rime} = ${w.word}`);
     const n = flips + 1; setFlips(n);
     if (n % 8 === 0) setTimeout(startBonus, 1600);
@@ -181,7 +183,7 @@ export default function WordFamilyGame() {
       setHelp(result.help);
       const level = result.help?.level || 1;
       setHighlight(level === 1 ? 1 : 2);
-      say(level === 1 ? target.sound : level === 2 ? `Listen to the ending: ${target.rime}. Now join the first sound to it.` : `${target.sound} Then ${target.rime}. Together they make ${target.word}. Let's pick it together!`);
+      say(level === 1 ? target.sound : level === 2 ? `Listen to the ending: ${ending}. Now join the first sound to it.` : `${target.sound} Then ${ending}. Together they make ${target.word}. Let's pick it together!`);
     } catch (e) { setError(e.message); } finally { busy.current = false; }
   };
 
@@ -208,9 +210,9 @@ export default function WordFamilyGame() {
   const renderGame = () => {
     if (bonus) return <ReadingBonus kind={bonus} words={words} say={say} onDone={finishBonus} />;
     if (mode === "explore" && shown) return <div className="reading-explore">
-      <ReadingBook key={active} word={shown} index={index} rime={family.content.rime} endingSound={family.content.ending_cue} flip={flipPage} hear={voice.say} />
+      <ReadingBook key={active} word={shown} index={index} rime={family.content.rime} endingSound={ending} flip={flipPage} hear={voice.say} />
       <div className="reading-book-actions">
-        <ToyButton color="sky" className="text-lg" onClick={() => voice.say(`${shown.sound} ... ${family.content.ending_cue} ... ${shown.word}!`)}>Blend it!</ToyButton>
+        <ToyButton color="sky" className="text-lg" onClick={() => voice.say(`${shown.sound} ... ${ending} ... ${shown.word}!`)}>Blend it!</ToyButton>
         <ToyButton color="mint" className="text-lg" onClick={exploreDone}><Puzzle className="h-5 w-5" /> Start challenge!</ToyButton>
       </div>
     </div>;
