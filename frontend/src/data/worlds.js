@@ -33,6 +33,7 @@ const quiz = (id, world, title, blurb, character, skill) => ({ id, world, title,
 const story = (id, character) => ({ id, world: "read-and-shine", title: STORIES[id].title, blurb: "Listen, read along and answer questions.", character, skill: "Story comprehension", kind: "story", total: STORIES[id].questions.length });
 
 export const ACTIVITIES = [
+  { id: "word-family-flip", world: "read-and-shine", title: "Word Family Flip & Build", blurb: "Flip it. Build it. Sound it. Read it! Four playful reading modes.", character: "hoppy", kind: "wordfamily", total: 4, skill: "Word families and independent reading", isNew: true },
   { id: "missing-numbers", world: "hop-and-count", title: "Missing Numbers", blurb: "Help Hoppy find the missing numbers!", character: "hoppy", kind: "missing", total: MISSING_PUZZLES.length, skill: "Counting" },
   { id: "more-or-less", world: "hop-and-count", title: "More or Less", blurb: "Help Froggy hop forward and backward!", character: "froggy", kind: "moreless", total: MORE_LESS_PUZZLES.length, skill: "More and less" },
   quiz("count-the-stars", "hop-and-count", "Count the Stars", "Count the stars and pick the number.", "sunny", "Counting objects"),

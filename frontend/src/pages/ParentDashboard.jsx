@@ -10,6 +10,7 @@ import { SettingsToggles } from "../components/SettingsToggles";
 import { CHARACTERS } from "../components/Characters";
 import { ACTIVITIES, WORLDS, activitiesOf, activityById } from "../data/worlds";
 import { skillOf } from "../games/logic";
+import ReadingInsights from "../components/ReadingInsights";
 
 const Stat = ({ label, value, testId, bg }) => (
   <div className={`rounded-2xl border-[3px] border-hc-navy p-4 ${bg}`} data-testid={testId}>
@@ -173,6 +174,7 @@ export default function ParentDashboard() {
           <p className="mt-1 font-semibold opacity-80">{profile.level === "K" ? "Kindergarten" : profile.level === "G1" ? "Grade 1" : "Grade 2"} level · switch child in the profiles list below.</p>
         </div>
         <AccountCard />
+        <ReadingInsights />
         <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Stat label="Stars earned" value={pdata.totalStars} testId="parent-stat-stars" bg="bg-hc-sunlight" />
           <Stat label="Puzzles completed" value={completed} testId="parent-stat-completed" bg="bg-hc-mintlight" />

@@ -43,6 +43,7 @@ export default function WorldPage() {
                   <img src={CHARACTERS[a.character].img} alt={CHARACTERS[a.character].name} className="h-24 w-24 object-contain" />
                   {isFinished(pdata, a.id) && <span className="flex items-center gap-1 rounded-full border-[3px] border-hc-navy bg-hc-mint px-2 py-0.5 text-sm font-bold"><Check className="h-4 w-4" strokeWidth={4} /> Done</span>}
                 </div>
+                {a.isNew && <span className="mt-2 self-start rounded-full bg-hc-sun px-3 py-1 text-sm font-bold">NEW</span>}
                 <h2 className="mt-2 font-fredoka text-2xl font-bold">{a.title}</h2>
                 <p className="flex-1 font-bold">{a.blurb}</p>
                 <div className="mt-3 flex items-center justify-between text-sm font-bold">

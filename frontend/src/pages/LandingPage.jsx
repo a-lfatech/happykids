@@ -170,6 +170,10 @@ export default function LandingPage() {
       </Poster>
 
       <div className="mx-auto max-w-6xl">
+        <section className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-3xl border-[3px] border-hc-navy bg-hc-sunlight p-6" aria-label="New reading game">
+          <div><span className="rounded-full bg-white px-3 py-1 text-sm font-bold">NEW in Read & Shine</span><h2 className="mt-3 font-fredoka text-3xl font-bold">Word Family Flip & Build</h2><p className="font-bold">Flip it. Build it. Sound it. Read it!</p></div>
+          <ToyButton color="coral" className="min-h-16 text-xl" onClick={() => navigate('/play/word-family-flip')}>Play the new reading game <ArrowRight /></ToyButton>
+        </section>
         {learner && <MapSection learner={learner} map={map} status={status} onRetry={() => load(learner)} onPlay={play} onRestart={restart} />}
 
         <section id="worlds" className="scroll-mt-28 pt-16" data-testid="worlds-section">

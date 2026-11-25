@@ -11,11 +11,13 @@ import ColourGame from "./ColourGame";
 import LetterSoundsGame from "./LetterSoundsGame";
 import WordSliderGame from "./WordSliderGame";
 import TracingGame from "./TracingGame";
+import WordFamilyGame from "./WordFamilyGame";
 
 export default function PlayRouter() {
   const { activityId } = useParams();
   const a = activityById(activityId);
   if (!a) return <Navigate to="/learn" replace />;
+  if (a.kind === "wordfamily") return <WordFamilyGame />;
   if (a.kind === "missing") return <MissingNumbersGame />;
   if (a.kind === "moreless") return <MoreOrLessGame />;
   if (a.kind === "quiz") return <QuizCore activity={a} rounds={QUIZZES[a.id]} />;
