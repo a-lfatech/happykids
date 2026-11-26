@@ -12,11 +12,13 @@ import LetterSoundsGame from "./LetterSoundsGame";
 import WordSliderGame from "./WordSliderGame";
 import TracingGame from "./TracingGame";
 import WordFamilyGame from "./WordFamilyGame";
+import LearningPlayPage from "./LearningPlayPage";
 
 export default function PlayRouter() {
   const { activityId } = useParams();
   const a = activityById(activityId);
   if (!a) return <Navigate to="/learn" replace />;
+  if (a.kind === "learningplay") return <LearningPlayPage activity={a} />;
   if (a.kind === "wordfamily") return <WordFamilyGame />;
   if (a.kind === "missing") return <MissingNumbersGame />;
   if (a.kind === "moreless") return <MoreOrLessGame />;

@@ -33,6 +33,14 @@ const quiz = (id, world, title, blurb, character, skill) => ({ id, world, title,
 const story = (id, character) => ({ id, world: "read-and-shine", title: STORIES[id].title, blurb: "Listen, read along and answer questions.", character, skill: "Story comprehension", kind: "story", total: STORIES[id].questions.length });
 
 export const ACTIVITIES = [
+  ...[
+    ["rhyming-words", "read-and-shine", "Rhyming Words", "rhymes", "Find words with the same ending sound."],
+    ["find-match-rhymes", "read-and-shine", "Find & Match Rhymes", "rhyme-match", "Tap two rhyming pictures."],
+    ["shape-connections", "think-and-play", "Shape Connections", "shapes", "Match everyday objects to their shapes."],
+    ["counting-corners", "hop-and-count", "Counting Corners", "corners", "Touch each corner and count it."],
+    ["f-for-fish", "create-and-explore", "F is for Fish", "fish", "Colour a fish with a repeating pattern."],
+    ["pattern-fish", "think-and-play", "Pattern Fish", "patterns", "Roll a die and follow its pattern, or create your own."],
+  ].map(([id, world, title, playKind, blurb]) => ({ id, world, title, playKind, blurb, character: "hoppy", kind: "learningplay", total: 6, skill: title, isNew: true })), 
   { id: "word-family-flip", world: "read-and-shine", title: "Word Family Flip & Build", blurb: "Flip it. Build it. Sound it. Read it! Four playful reading modes.", character: "hoppy", kind: "wordfamily", total: 4, skill: "Word families and independent reading", isNew: true },
   { id: "missing-numbers", world: "hop-and-count", title: "Missing Numbers", blurb: "Help Hoppy find the missing numbers!", character: "hoppy", kind: "missing", total: MISSING_PUZZLES.length, skill: "Counting" },
   { id: "more-or-less", world: "hop-and-count", title: "More or Less", blurb: "Help Froggy hop forward and backward!", character: "froggy", kind: "moreless", total: MORE_LESS_PUZZLES.length, skill: "More and less" },
