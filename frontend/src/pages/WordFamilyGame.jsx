@@ -12,6 +12,8 @@ import { FamilyTabs, PictureChoices, ReadingBook } from "../components/ReadingBo
 import { getStickers } from "../components/ReadingBonus";
 import { LearningPlay, PLAY_GAMES } from "../components/LearningPlay";
 import { WordPicture } from "../components/WordPicture";
+import { SentenceBuild } from "../components/SentenceBuild";
+import { shuffleItems } from "../games/logic";
 import { createLearner, getHelp, getLearner, saveLearner, submitAnswer } from "../lib/mastery";
 import { supabase } from "../lib/supabase";
 import { sfx, stopSpeaking } from "../lib/audioManager";
@@ -58,6 +60,7 @@ export default function WordFamilyGame() {
   const [wins, setWins] = useState(0);
   const [bonus, setBonus] = useState(null);
   const [bonusCount, setBonusCount] = useState(0);
+  const [playDeck, setPlayDeck] = useState(() => shuffleItems(PLAY_GAMES));
   const [stickers, setStickers] = useState(getStickers);
   const [shake, setShake] = useState(null);
   const [paused, setPaused] = useState(false);
@@ -125,7 +128,8 @@ export default function WordFamilyGame() {
     setDestination(to);
     if (to) saveJourney(to.active, to.mode);
     setBonusCount(n => n + 1);
-    setBonus(PLAY_GAMES[bonusCount % PLAY_GAMES.length].id);
+    setBonus(playDeck[bonusCount % playDeck.length].id);
+    if ((bonusCount + 1) % playDeck.length === 0) setPlayDeck(shuffleItems(PLAY_GAMES));
   };
   const finishBonus = () => {
     setBonus(null); setStickers(getStickers());
@@ -180,10 +184,11 @@ export default function WordFamilyGame() {
         const cheer = pick(PRAISE);
         setPraise(cheer); setParty(p => p + 1); setWins(w => w + 1);
         if (result.newly_mastered) setTimeout(() => sfx.fanfare(), 600);
-        say(`${cheer} ${successMessage(result)}`);
+        const sentenceComplete = (family.content.whole_word || target.whole_word) && mode !== "match";
+        say(sentenceComplete ? `${cheer} You made a sentence! Let's read it together. ${target.meaning || target.word}` : `${cheer} ${successMessage(result)}`);
         const count = stageCount + 1; setStageCount(count); saveJourney(active, mode, count);
         await refresh();
-        if (count >= 3) {
+        if (count >= 3 && !sentenceComplete) {
           say(`${cheer} ${MODES.find(m => m.id === mode)?.label} complete! Time for a game, then a new adventure.`);
           clearTimeout(advanceTimer.current);
           advanceTimer.current = setTimeout(advanceStage, 1800);
@@ -242,6 +247,7 @@ export default function WordFamilyGame() {
     if (loading || !target) return <p role="status" className="font-fredoka text-xl font-bold">Opening your book...</p>;
     const wholeWord = family.content.whole_word || target.whole_word;
     const showWord = mode === "match" || challengeQuestion;
+    if (wholeWord && !showWord) return <SentenceBuild target={target} attempt={round.attempt_id} choices={choices} solved={solved} praise={praise} choose={choose} next={next} say={say} stageCount={stageCount} shake={shake} />;
     const pictureWords = wholeWord ? choices.map(c => families.flatMap(f => f.content.words).find(w => w.word === c)).filter(Boolean) : words;
     return <div className={`reading-round ${showWord ? 'reading-match' : 'reading-build'}`}>
       <h2 className="reading-round-title font-fredoka">{solved ? praise : showWord ? wholeWord ? "Match the word to its clue!" : "Read it. Find the picture!" : mode === "challenge" ? `Story challenge · ${Math.min(stageCount,3)}/3` : wholeWord ? "Find the missing word!" : "Which sound starts this word?"}</h2>
@@ -249,7 +255,7 @@ export default function WordFamilyGame() {
         ? <p className="reading-target-word font-fredoka">{target.word}</p>
         : <>
           <button className="reading-target-picture" type="button" onClick={() => voice.say(target.word)} aria-label={`Picture of ${target.word}`}><WordPicture word={target.word} picture={target.picture} /></button>
-          {wholeWord ? <p className="reading-context font-fredoka">{(target.meaning || target.word).replace(new RegExp(`\\b${target.word}\\b`, "i"), "___")}</p> : <p className="reading-build-word font-fredoka">
+          {<p className="reading-build-word font-fredoka">
             <span className={`inline-block min-w-[1.2em] rounded-2xl border-[3px] border-dashed border-hc-navy px-2 ${solved ? "bg-hc-mintlight" : highlight === 1 ? "bg-hc-sun" : "bg-hc-skylight"}`}>{solved ? target.onset : "?"}</span>
             <span className={`rounded-2xl px-2 ${highlight === 2 ? "bg-hc-sun" : ""}`}>{target.rime}</span>
           </p>}

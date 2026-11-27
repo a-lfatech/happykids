@@ -34,6 +34,9 @@ const story = (id, character) => ({ id, world: "read-and-shine", title: STORIES[
 
 export const ACTIVITIES = [
   ...[
+    ["who-hid", "think-and-play", "Who Hid?", "memory-peek", "Peek at the animals, then find who is hiding."],
+    ["sound-safari", "read-and-shine", "Sound Safari", "sound-trail", "Follow a different trail of animal words each time."],
+    ["little-detective", "think-and-play", "Little Detective", "odd-one", "Find the odd picture and discover what connects the others."],
     ["rhyming-words", "read-and-shine", "Rhyming Words", "rhymes", "Find words with the same ending sound."],
     ["find-match-rhymes", "read-and-shine", "Find & Match Rhymes", "rhyme-match", "Tap two rhyming pictures."],
     ["shape-connections", "think-and-play", "Shape Connections", "shapes", "Match everyday objects to their shapes."],

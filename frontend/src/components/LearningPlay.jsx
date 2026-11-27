@@ -1,8 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ToyButton } from "./ToyButton";
 import { sfx } from "../lib/audioManager";
+import { shuffleItems } from "../games/logic";
+import { QuickPlay } from "./QuickPlay";
+import { Confetti } from "./Confetti";
 
 export const PLAY_GAMES = [
+  { id: "memory-peek", title: "Who Hid?", note: "Peek at the animals, then find who is hiding." },
+  { id: "sound-trail", title: "Sound Safari", note: "Follow the animal words in the right order." },
+  { id: "odd-one", title: "Little Detective", note: "Find the picture that does not belong." },
   { id: "rhymes", title: "Rhyming Words", note: "Find words with the same ending sound." },
   { id: "rhyme-match", title: "Find & Match Rhymes", note: "Tap two pictures whose words rhyme." },
   { id: "shapes", title: "Shape Connections", note: "Find shapes in everyday objects." },
@@ -17,6 +23,18 @@ const RHYMES = [
   ["pan", "fan", "book", "tree", "🍳", "🪭", "📕", "🌳"],
   ["log", "frog", "hat", "moon", "🪵", "🐸", "🎩", "🌙"],
   ["car", "star", "cat", "sun", "🚗", "⭐", "🐈", "☀️"],
+  ["bee", "tree", "moon", "cat", "🐝", "🌳", "🌙", "🐈"],
+  ["snail", "whale", "dog", "fish", "🐌", "🐳", "🐕", "🐟"],
+  ["fox", "box", "sun", "cake", "🦊", "📦", "☀️", "🍰"],
+  ["bear", "chair", "boat", "bee", "🐻", "🪑", "⛵", "🐝"],
+  ["moon", "spoon", "dog", "hat", "🌙", "🥄", "🐕", "🎩"],
+  ["mouse", "house", "tree", "fish", "🐭", "🏠", "🌳", "🐟"],
+  ["sock", "rock", "bee", "hat", "🧦", "🪨", "🐝", "🎩"],
+  ["cake", "snake", "sun", "dog", "🍰", "🐍", "☀️", "🐕"],
+  ["chick", "brick", "moon", "fish", "🐤", "🧱", "🌙", "🐟"],
+  ["pear", "bear", "sun", "frog", "🍐", "🐻", "☀️", "🐸"],
+  ["goat", "coat", "tree", "cat", "🐐", "🧥", "🌳", "🐈"],
+  ["king", "ring", "box", "hat", "🤴", "💍", "📦", "🎩"],
 ];
 const SHAPES = [
   { name: "circle", object: "a round clock", picture: "🕰️", points: [] },
@@ -26,6 +44,7 @@ const SHAPES = [
   { name: "oval", object: "an oval egg", picture: "🥚", points: [] },
   { name: "hexagon", object: "a honeycomb cell", picture: "🍯", points: [[25,12],[75,12],[95,50],[75,88],[25,88],[5,50]] },
 ];
+const OBJECT_NAMES = { circle: "a bicycle wheel", triangle: "a tent", square: "a square window", rectangle: "an envelope", oval: "an oval mirror", hexagon: "a hexagonal tile" };
 const COLORS = ["#ed6067", "#68bc86", "#58aee6"];
 const PATTERNS = [[0,1],[1,2],[0,0,2],[0,1,1],[0,0,1,1],[0,1,2]];
 export function Shape({ name, marked = [], onCorner }) {
@@ -38,7 +57,15 @@ export function Shape({ name, marked = [], onCorner }) {
     </g>)}
   </svg>;
 }
-function ShapeObject({ name }) {
+function ShapeObject({ name, variant = false }) {
+  if (variant) return <svg viewBox="0 0 140 100" className="shape-object-scene" role="img" aria-label={OBJECT_NAMES[name]}>
+    {name === "circle" && <><circle cx="70" cy="50" r="38" fill="#fff1b5" stroke="#1f2547" strokeWidth="5" /><path d="M70 12V88M32 50H108M43 23L97 77M43 77L97 23" stroke="#1f2547" strokeWidth="3" /></>}
+    {name === "triangle" && <><path d="M70 8L15 88H125Z" fill="#68bc86" stroke="#1f2547" strokeWidth="3" /><path d="M70 30L45 88H95Z" fill="#1f2547" /></>}
+    {name === "square" && <><rect x="32" y="12" width="76" height="76" fill="#d5efff" stroke="#1f2547" strokeWidth="5" /><path d="M70 12V88M32 50H108" stroke="#1f2547" strokeWidth="4" /></>}
+    {name === "rectangle" && <><rect x="15" y="20" width="110" height="65" fill="#ffe5a8" stroke="#1f2547" strokeWidth="3" /><path d="M15 20L70 60L125 20" fill="none" stroke="#1f2547" strokeWidth="3" /></>}
+    {name === "oval" && <><ellipse cx="70" cy="50" rx="31" ry="43" fill="#ffd16a" stroke="#1f2547" strokeWidth="3" /><ellipse cx="70" cy="50" rx="24" ry="35" fill="#d5efff" /><path d="M55 64L79 31" stroke="white" strokeWidth="5" /></>}
+    {name === "hexagon" && <><polygon points="45,10 95,10 120,50 95,90 45,90 20,50" fill="#68bc86" stroke="#1f2547" strokeWidth="4" /><polygon points="50,22 90,22 106,50 90,78 50,78 34,50" fill="none" stroke="white" strokeWidth="3" /></>}
+  </svg>;
   return <svg viewBox="0 0 140 100" className="shape-object-scene" role="img" aria-label={SHAPES.find(s => s.name === name).object}>
     {name === "circle" && <><circle cx="70" cy="50" r="37" fill="#fff1b5" stroke="#1f2547" strokeWidth="3" /><path d="M70 24V50L90 62" fill="none" stroke="#1f2547" strokeWidth="4" /><text x="70" y="21" textAnchor="middle" fontSize="10">12</text><text x="70" y="85" textAnchor="middle" fontSize="10">6</text></>}
     {name === "triangle" && <><rect x="40" y="54" width="60" height="40" fill="#ffd38c" stroke="#1f2547" strokeWidth="3" /><path d="M70 8L18 57H122Z" fill="#ef7976" stroke="#1f2547" strokeWidth="3" /><rect x="60" y="66" width="20" height="28" fill="#1f2547" /></>}
@@ -57,7 +84,10 @@ function PatternFish({ colors }) {
     <path d="M33 96Q46 112 60 97" fill="none" stroke="#1f2547" strokeWidth="3" />
   </svg>;
 }
-export function LearningPlay({ kind, say, onDone, onExit = onDone, onRoundComplete, rounds = 3 }) {
+export function LearningPlay(props) {
+  return ["memory-peek", "sound-trail", "odd-one"].includes(props.kind) ? <QuickPlay {...props} /> : <ClassicPlay {...props} />;
+}
+function ClassicPlay({ kind, say, onDone, onExit = onDone, onRoundComplete, rounds = 3 }) {
   const [round, setRound] = useState(0);
   const [solved, setSolved] = useState(false);
   const [message, setMessage] = useState("");
@@ -67,8 +97,16 @@ export function LearningPlay({ kind, say, onDone, onExit = onDone, onRoundComple
   const [scales, setScales] = useState([]);
   const [custom, setCustom] = useState(false);
   const game = PLAY_GAMES.find(g => g.id === kind) || PLAY_GAMES[0];
-  const rhyme = RHYMES[round % RHYMES.length];
-  const shape = SHAPES[round % SHAPES.length];
+  const [rhymeDeck] = useState(() => shuffleItems(RHYMES));
+  const [shapeDeck] = useState(() => shuffleItems(SHAPES));
+  const [reverseStart] = useState(() => Math.random() > 0.5);
+  const rhyme = rhymeDeck[round % rhymeDeck.length];
+  const shape = shapeDeck[round % shapeDeck.length];
+  const reversed = (round % 2 === 0) === reverseStart;
+  const objectVariant = useMemo(() => Math.random() > 0.5, [round]);
+  const objectLabel = objectVariant ? OBJECT_NAMES[shape.name] : shape.object;
+  const rhymeOptions = useMemo(() => shuffleItems(kind === "rhymes" ? [1,2,3] : [0,1,2,3]), [round, kind]);
+  const shapeOptions = useMemo(() => shuffleItems([shape.name, ...shuffleItems(SHAPES.filter(s => s.name !== shape.name)).slice(0,2).map(s => s.name)]), [shape]);
   const pattern = PATTERNS[kind === "fish" ? round % PATTERNS.length : (die || 1)-1];
   useEffect(() => { say(game.note); }, [kind]); // eslint-disable-line react-hooks/exhaustive-deps
   const answer = (correct, explanation) => {
@@ -94,14 +132,15 @@ export function LearningPlay({ kind, say, onDone, onExit = onDone, onRoundComple
     setSelected(picked);
     if (picked.length===2) { answer(picked.includes(0) && picked.includes(1), `${rhyme[0]} and ${rhyme[1]} rhyme! They have the same ending sound.`); setSelected([]); }
   };
-  return <section className="learning-play">
+  return <section className="learning-play relative">
+    {solved && <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true"><Confetti count={20} /></div>}
     <div className="play-heading"><h2 className="font-fredoka">{game.title}</h2><span>{round+1} / {rounds}</span></div>
-    <p className="play-prompt">{kind === "rhymes" ? `What rhymes with ${rhyme[0]}?` : kind === "rhyme-match" ? "Tap two rhyming pictures." : kind === "shapes" ? `Which shape is like ${shape.object}?` : kind === "corners" ? `Count the corners of a ${shape.name}.` : "Add six colour scales to your fish."}</p>
+    <p className="play-prompt">{kind === "rhymes" ? `What rhymes with ${rhyme[0]}?` : kind === "rhyme-match" ? "Tap two rhyming pictures." : kind === "shapes" ? reversed ? `Find an object shaped like a ${shape.name}.` : `Which shape is like ${objectLabel}?` : kind === "corners" ? `Count the corners of a ${shape.name}.` : "Add six colour scales to your fish."}</p>
     {(kind === "rhymes" || kind === "rhyme-match") && <>
       {kind === "rhymes" && <button className="rhyme-target toy-focus" onClick={() => say(rhyme[0])}><span>{rhyme[4]}</span>{rhyme[0]}</button>}
-      <div className="play-options">{(kind === "rhymes" ? [[1,2,3],[2,1,3],[2,3,1]][round%3] : [0,2,1,3]).map(i => <button key={i} disabled={solved} aria-pressed={selected.includes(i)} className={`toy-focus play-option ${selected.includes(i) ? "selected" : ""}`} onClick={() => kind === "rhymes" ? answer(i===1, `${rhyme[0]} and ${rhyme[1]} rhyme!`) : pair(i)}><span>{rhyme[i+4]}</span><strong>{rhyme[i]}</strong></button>)}</div>
+      <div className="play-options">{rhymeOptions.map(i => <button key={i} disabled={solved} aria-pressed={selected.includes(i)} className={`toy-focus play-option ${selected.includes(i) ? "selected" : ""}`} onClick={() => kind === "rhymes" ? answer(i===1, `${rhyme[0]} and ${rhyme[1]} rhyme!`) : pair(i)}><span>{rhyme[i+4]}</span><strong>{rhyme[i]}</strong></button>)}</div>
     </>}
-    {kind === "shapes" && <><div className="play-object"><ShapeObject name={shape.name} /><small>{shape.object}</small></div><div className="play-options">{[shape.name,...SHAPES.filter(s => s.name!==shape.name).slice(round%3,round%3+2).map(s => s.name)].sort().map(name => <button className="toy-focus play-option" disabled={solved} key={name} onClick={() => answer(name===shape.name, `Yes! ${shape.object} has a ${shape.name} shape.`)}><Shape name={name} /><strong>{name}</strong></button>)}</div></>}
+    {kind === "shapes" && <><div className="play-object">{reversed ? <Shape name={shape.name} /> : <ShapeObject name={shape.name} variant={objectVariant} />}<small>{reversed ? shape.name : objectLabel}</small></div><div className="play-options">{shapeOptions.map(name => <button className="toy-focus play-option" disabled={solved} key={name} onClick={() => answer(name===shape.name, `Yes! ${objectLabel} has a ${shape.name} shape.`)}>{reversed ? <ShapeObject name={name} variant={objectVariant} /> : <Shape name={name} />}<strong>{reversed ? objectVariant ? OBJECT_NAMES[name] : SHAPES.find(s => s.name === name).object : name}</strong></button>)}</div></>}
     {kind === "corners" && <><Shape name={shape.name} marked={marked} onCorner={i => { if (!marked.includes(i)) { setMarked([...marked,i]); say(String(marked.length+1)); } }} /><div className="play-options">{[...new Set([shape.points.length,Math.max(1,shape.points.length-1),shape.points.length+1])].sort((a,b)=>a-b).map(n => <ToyButton key={n} disabled={solved} color="sun" onClick={() => answer(n===shape.points.length, `${shape.name} has ${n} corners!`)}>{n}</ToyButton>)}</div></>}
     {(kind === "fish" || kind === "patterns") && <>
       {kind === "patterns" && <div className="fish-guide"><ToyButton color="sun" onClick={() => { const d=1+Math.floor(Math.random()*6); setDie(d); setScales([]); setSolved(false); say(`You rolled ${d}. Follow the colour guide.`); }} disabled={solved}>Roll die {die && `: ${die}`}</ToyButton><button className="toy-focus rounded-xl bg-white px-2 py-1 font-bold" disabled={solved} onClick={() => { setCustom(c => !c); setScales([]); }}>{custom ? "Use guide" : "Create my own"}</button></div>}
